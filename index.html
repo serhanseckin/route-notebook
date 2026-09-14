@@ -13,7 +13,8 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<script src="core.js"></script>
 <script type="importmap">
 {
   "imports": {
@@ -130,7 +131,29 @@
   .lbl .t{overflow:hidden;text-overflow:ellipsis}
   .lbl.is-selected{background:var(--ink);color:var(--paper)}
 
+  .scene-fx{
+    position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(60,45,25,.28) 100%);
+  }
+  .scene-fx::after{
+    content:"";position:absolute;inset:0;opacity:.07;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.2 0 0 0 0 0.15 0 0 0 0 0.1 0 0 0 0.9 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    background-size:160px 160px;
+  }
   .scene-ui{position:absolute;inset:0;pointer-events:none}
+  .lbl .t{font-family:"Caveat",cursive;font-size:15px;font-weight:600;letter-spacing:.01em}
+  .lbl.is-bubble{max-width:240px;white-space:normal;border-radius:12px;padding:6px 10px;background:#fffdf7;transform:translate(-50%,-100%) translateY(-6px)}
+  .lbl.is-bubble .t{font-size:16px;line-height:1.2}
+  .lbl.is-bubble .t small{display:block;font-family:"Caveat",cursive;font-size:14px;font-weight:500;color:var(--ink-2)}
+  .step-note,.hotel-card .note{font-family:"Caveat",cursive;font-size:16px;font-style:normal;color:var(--ink)}
+  .scene-time{
+    position:absolute;left:50%;transform:translateX(-50%);bottom:44px;
+    display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2);
+    background:rgba(244,238,226,.9);border:1px solid var(--line);border-radius:999px;padding:4px 10px;
+  }
+  .scene-time b{font-family:var(--font-display);font-size:14px;color:var(--ink);min-width:44px;text-align:center}
+  .scene-time input[type=range]{width:120px;accent-color:var(--accent);height:18px}
+  .walk-ctl{display:flex;gap:6px;align-items:center}
   .scene-ui > *{pointer-events:auto}
   .scene-hint{
     position:absolute;left:14px;top:12px;
@@ -179,6 +202,26 @@
   .nav-strip .nav-main span{color:var(--ink-2);font-size:12px}
   .nav-strip a.btn{text-decoration:none}
   .lbl.is-me .n{background:#2f6fd6}
+  .lbl.is-other{opacity:.55;font-size:11px;padding:2px 6px 2px 2px;box-shadow:none}
+  .lbl.is-other .n{background:var(--muted);min-width:18px;height:18px;font-size:10px}
+  .day-bar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+  .day-bar button{
+    border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 11px;font-size:13px;color:var(--ink-2);
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .day-bar button.is-on{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+  .day-bar button .cnt{font-size:11px;background:var(--paper-3);color:var(--ink-2);border-radius:999px;padding:0 6px;line-height:16px}
+  .day-bar button.is-on .cnt{background:var(--accent);color:#fff}
+  .day-settings{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px;font-size:12.5px;color:var(--ink-2)}
+  .day-settings label{display:flex;align-items:center;gap:6px}
+  .day-settings .input{width:auto;padding:4px 8px;font-size:13px}
+  .times{font-size:12.5px;color:var(--ink);margin-top:4px}
+  .times b.closed{color:var(--danger)}
+  .times .wait{color:var(--accent-ink)}
+  .times .hours{color:var(--muted);margin-left:6px}
+  .why{font-size:11.5px;color:var(--muted);margin-top:2px;font-style:italic}
+  .warn a{color:var(--accent-ink);font-weight:500;margin-left:4px}
+  .chips.small button{padding:3px 9px;font-size:12.5px}
   .step-note{font-size:12.5px;color:var(--ink-2);font-style:italic;margin-top:2px}
   .hotel-card .note{font-size:12.5px;color:var(--ink-2);font-style:italic}
   .leg .dirs{margin-top:4px}
@@ -306,13 +349,13 @@
 
   /* ---------- Route page ---------- */
   .summary{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:0;
     border:1.5px solid var(--ink);border-radius:var(--radius);
     margin-bottom:14px;overflow:hidden;background:#fbf8f1;
   }
   .summary div{padding:8px 10px;border-left:1px dashed var(--line)}
   .summary div:first-child{border-left:0}
-  .summary b{display:block;font-family:var(--font-display);font-size:19px;font-weight:600;line-height:1.1}
+  .summary b{display:block;font-family:var(--font-display);font-size:17px;font-weight:600;line-height:1.1;white-space:nowrap}
   .summary span{font-size:11.5px;color:var(--muted)}
 
   .hotel-card{
@@ -469,9 +512,11 @@
     .attrib{bottom:8px;left:8px}
     .map-status{bottom:28px;right:8px;max-width:70%}
     .nav-strip{left:8px;right:8px;bottom:26px;padding:6px 8px;gap:6px}
+    .scene-time{bottom:26px;padding:3px 8px;font-size:11px}
+    .scene-time input[type=range]{width:80px}
     .nav-strip .btn{padding:5px 8px}
     .lbl{font-size:11px;max-width:120px}
-    .summary b{font-size:16px}
+    .summary b{font-size:14px}
     .bulk-head,.bulk-row{grid-template-columns:1fr 1.3fr 48px 26px}
     .veil{align-items:flex-end;padding:0}
     .sheet{width:100%;border-radius:12px 12px 0 0;border-bottom:0;box-shadow:none;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
@@ -488,17 +533,22 @@
   <div class="layout">
     <section class="scene-wrap" id="scene-wrap">
       <canvas id="scene"></canvas>
+      <div class="scene-fx"></div>
       <div class="labels" id="labels"></div>
       <div class="scene-ui">
         <div class="scene-hint"><b>Tap</b> the ground → add a place · drag → rotate · scroll/pinch → zoom</div>
         <div class="scene-status" id="scene-status"></div>
         <div class="scene-tools">
+          <button class="btn btn-sm btn-ghost" id="walk-btn" title="Walk the route with a little figure">▶ Walk</button>
           <button class="btn btn-sm btn-ghost" id="loc-btn" title="Show my location on the map">Locate</button>
           <button class="btn btn-sm btn-ghost" id="map-btn" title="Reload map data">Map ↻</button>
           <button class="btn btn-sm" id="fit-btn" title="Fit all places in view">Fit</button>
         </div>
         <div class="map-status" id="map-status"></div>
         <div class="nav-strip" id="nav-strip"></div>
+        <div class="scene-time" id="scene-time" title="Time of day in the scene — follows the schedule when you tap a stop">
+          <span>🕘</span><input type="range" id="time-range" min="0" max="1439" step="15" value="570"><b id="time-out">09:30</b>
+        </div>
         <div class="attrib">Map data © OpenStreetMap contributors</div>
         <div class="scene-legend">
           <span><i style="background:var(--teal)"></i>Hotel</span>
@@ -521,6 +571,11 @@
         <div class="page is-active" data-page="route">
           <h2 class="sec" id="route-title">Walking route</h2>
           <p class="lead">Starts at the hotel and favours high-priority places. Recalculates itself on every change.</p>
+          <div class="day-bar" id="day-bar"></div>
+          <div class="day-settings">
+            <label>Day 1 date <input type="date" id="trip-date" class="input"></label>
+            <label>Start <input type="time" id="trip-start" class="input" step="300"></label>
+          </div>
           <div class="summary" id="route-summary"></div>
           <div id="hotel-card"></div>
           <ol class="steps" id="steps"></ol>
@@ -610,6 +665,18 @@
     <div class="field" id="f-cat-field">
       <label>Place type</label>
       <div class="chips" id="f-cat"></div>
+    </div>
+    <div class="field" id="f-day-field">
+      <label>Day</label>
+      <div class="chips small" id="f-day"></div>
+    </div>
+    <div class="field" id="f-stay-field">
+      <label for="f-stay">Time to spend there <span style="color:var(--muted);font-weight:400">minutes</span></label>
+      <input class="input" id="f-stay" type="number" min="5" max="600" step="5" placeholder="45">
+    </div>
+    <div class="field" id="f-hours-field">
+      <label for="f-hours">Opening hours <span style="color:var(--muted);font-weight:400">OSM format, filled from the map when known</span></label>
+      <input class="input" id="f-hours" placeholder="e.g. Mo-Fr 09:00-18:00; Sa 10:00-14:00" autocomplete="off">
     </div>
     <div class="field" id="f-prio-field">
       <label for="f-prio">How much do I want to go? <span style="color:var(--muted);font-weight:400">1 = nice to have · 10 = must</span></label>
@@ -728,46 +795,38 @@ const CITY_KEYS = Object.keys(CITIES);
 
 /* Place types: icon, colour and 3D pin head */
 const CATS = {
-  restaurant: { label: 'Restaurant', emoji: '🍽️', color: 0xe0702f, head: 'octa' },
-  cafe:       { label: 'Café',     emoji: '☕',  color: 0x9a6a3c, head: 'cup' },
-  bar:        { label: 'Bar',      emoji: '🍸', color: 0x7d4c9e, head: 'ico' },
-  museum:     { label: 'Museum',   emoji: '🏛️', color: 0x3f6fb5, head: 'box' },
-  sight:      { label: 'Sight', emoji: '📍', color: 0xd6a52f, head: 'spire' },
-  shop:       { label: 'Shop',     emoji: '🛍️', color: 0xd2588c, head: 'pyr' },
-  park:       { label: 'Park',     emoji: '🌳', color: 0x5e9c5a, head: 'tree' },
-  other:      { label: 'Other',    emoji: '⭐', color: 0x6f6f6f, head: 'dodeca' },
+  restaurant: { label: 'Restaurant', emoji: '🍽️', color: 0xe0702f, head: 'octa', stay: 75 },
+  cafe:       { label: 'Café',     emoji: '☕',  color: 0x9a6a3c, head: 'cup', stay: 40 },
+  bar:        { label: 'Bar',      emoji: '🍸', color: 0x7d4c9e, head: 'ico', stay: 60 },
+  museum:     { label: 'Museum',   emoji: '🏛️', color: 0x3f6fb5, head: 'box', stay: 120 },
+  sight:      { label: 'Sight', emoji: '📍', color: 0xd6a52f, head: 'spire', stay: 45 },
+  shop:       { label: 'Shop',     emoji: '🛍️', color: 0xd2588c, head: 'pyr', stay: 30 },
+  park:       { label: 'Park',     emoji: '🌳', color: 0x5e9c5a, head: 'tree', stay: 45 },
+  other:      { label: 'Other',    emoji: '⭐', color: 0x6f6f6f, head: 'dodeca', stay: 45 },
 };
 const catOf = p => CATS[p?.cat] ? p.cat : 'sight';
-function catFromOsm(key, value) {
-  key = key || ''; value = value || '';
-  if (key === 'amenity') {
-    if (/^(restaurant|fast_food|food_court|bistro)$/.test(value)) return 'restaurant';
-    if (/^(cafe|ice_cream|bubble_tea)$/.test(value)) return 'cafe';
-    if (/^(bar|pub|nightclub|biergarten|wine_bar)$/.test(value)) return 'bar';
-    if (/^(marketplace)$/.test(value)) return 'shop';
-    if (/^(place_of_worship|theatre|arts_centre|fountain|townhall)$/.test(value)) return 'sight';
-    return 'other';
-  }
-  if (key === 'tourism') return /^(museum|gallery)$/.test(value) ? 'museum' : 'sight';
-  if (key === 'shop') return /^(bakery|pastry|confectionery|coffee|tea|deli)$/.test(value) ? 'cafe' : 'shop';
-  if (key === 'leisure') return /^(park|garden|nature_reserve)$/.test(value) ? 'park' : 'sight';
-  if (key === 'historic' || key === 'building' || key === 'place' || key === 'natural') return 'sight';
-  return 'sight';
-}
+const catFromOsm = RouteCore.catFromOsm;
 const TRANSIT_WARN_M = 1800;
 
 /* =====================================================================
    State and persistence
    ===================================================================== */
 const STORAGE_KEY = 'rotaDefteri.v1';
-function emptyCity() { return { hotel: null, places: [] }; }
+const todayISO = () => new Date().toISOString().slice(0, 10);
+function emptyCity() { return { hotel: null, places: [], day: 1, days: 1, startMin: 570, date: todayISO() }; }
+function normalizeCity(c) {
+  c.day ||= 1; c.startMin ??= 570; c.date ||= todayISO();
+  c.places.forEach(p => { p.day ||= 1; });
+  c.days = Math.max(c.days || 1, c.day, ...c.places.map(p => p.day));
+  return c;
+}
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const s = JSON.parse(raw);
     if (!s || !s.cities) return null;
-    for (const k of CITY_KEYS) if (!s.cities[k]) s.cities[k] = emptyCity();
+    for (const k of CITY_KEYS) { if (!s.cities[k]) s.cities[k] = emptyCity(); normalizeCity(s.cities[k]); }
     if (!CITIES[s.active]) s.active = CITY_KEYS[0];
     return s;
   } catch { return null; }
@@ -787,69 +846,24 @@ const cityDef = () => CITIES[state.active];
 /* =====================================================================
    Algorithm (as specified)
    ===================================================================== */
-function haversine(a, b) {
-  const R = 6371000, toR = d => d * Math.PI / 180;
-  const dLat = toR(b.lat - a.lat), dLon = toR(b.lon - a.lon);
-  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toR(a.lat)) * Math.cos(toR(b.lat)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(s));
-}
-function walkEstimate(distM) {
-  const routedDist = distM * 1.3;   // detour factor
-  const timeMin = routedDist / 80;  // ~4.8 km/h walking speed
-  return { distM: routedDist, timeMin };
-}
-function priorityFactor(score = 5) { return 0.5 + score / 10; }
-function routingCost(i, j) { return walkEstimate(haversine(i, j)).distM / priorityFactor(j.priority ?? 5); }
-
+const { haversine, walkEstimate, priorityFactor, routingCost } = RouteCore;
+const ohCache = new Map();
+const parsedHours = str => { if (!str) return null; if (!ohCache.has(str)) ohCache.set(str, RouteCore.parseOpeningHours(str)); return ohCache.get(str); };
+const stayOf = p => (p.stay > 0 ? +p.stay : CATS[catOf(p)].stay);
+function dayDow(c, day) { const d = new Date((c.date || todayISO()) + 'T12:00:00'); d.setDate(d.getDate() + (day - 1)); return (d.getDay() + 6) % 7; }
+function scheduleOpts(c) { return { startMin: c.startMin ?? 570, dow: dayDow(c, c.day || 1), stayOf, hoursOf: p => parsedHours(p.hours) }; }
+const dayPlacesOf = c => c.places.filter(p => (p.day || 1) === (c.day || 1));
 function computeRoute(c) {
-  const places = c.places;
-  if (!places.length && !c.hotel) return null;
-  const nodes = c.hotel ? [{ ...c.hotel, isHotel: true }, ...places] : [...places];
-  const n = nodes.length;
-  if (n === 1) return finish(nodes, [0]);
-
-  const cost = nodes.map((a, i) => nodes.map((b, j) => (i === j ? 0 : routingCost(a, b))));
-  const total = o => { let s = 0; for (let i = 0; i < o.length - 1; i++) s += cost[o[i]][o[i + 1]]; return s; };
-
-  // 1) Nearest neighbour (start: hotel, or the first added place)
-  const visited = new Array(n).fill(false);
-  let order = [0]; visited[0] = true;
-  for (let k = 1; k < n; k++) {
-    const last = order[order.length - 1];
-    let best = -1, bc = Infinity;
-    for (let j = 0; j < n; j++) if (!visited[j] && cost[last][j] < bc) { bc = cost[last][j]; best = j; }
-    order.push(best); visited[best] = true;
-  }
-
-  // 2) 2-opt (open route, fixed start). Cost is asymmetric, so the total is recomputed per candidate.
-  let best = total(order), improved = true, guard = 0;
-  while (improved && guard++ < 200) {
-    improved = false;
-    for (let i = 1; i < n - 1; i++) {
-      for (let j = i + 1; j < n; j++) {
-        const cand = order.slice(0, i).concat(order.slice(i, j + 1).reverse(), order.slice(j + 1));
-        const t = total(cand);
-        if (t < best - 1e-9) { best = t; order = cand; improved = true; }
-      }
-    }
-  }
-  return finish(nodes, order);
-
-  // 3) Displayed distance/time: unweighted real walking estimate
-  function finish(nodes, order) {
-    const seq = order.map(i => nodes[i]);
-    const steps = seq.map((node, k) => {
-      if (k === 0) return { node, distM: 0, timeMin: 0, warn: false, leg: null };
-      const leg = legCache.get(legKey(seq[k - 1], node));
-      if (leg && leg.shape) return { node, distM: leg.distM, timeMin: leg.timeMin, warn: leg.distM > TRANSIT_WARN_M, leg };
-      const w = walkEstimate(haversine(seq[k - 1], node));
-      return { node, distM: w.distM, timeMin: w.timeMin, warn: w.distM > TRANSIT_WARN_M, leg: null };
-    });
-    const totalDist = steps.reduce((s, x) => s + x.distM, 0);
-    const totalTime = steps.reduce((s, x) => s + x.timeMin, 0);
-    return { steps, totalDist, totalTime, startIsHotel: !!c.hotel };
-  }
+  const sub = { ...c, places: dayPlacesOf(c) };
+  const r = RouteCore.computeRoute(sub, {
+    warnM: TRANSIT_WARN_M,
+    legOf: (a, b) => { const l = legCache.get(legKey(a, b)); return l && l.shape ? l : null; },
+    schedule: scheduleOpts(c),
+  });
+  if (r) r.sched = RouteCore.scheduleSteps(r.steps, scheduleOpts(c));
+  return r;
 }
+const { hhmm } = RouteCore;
 
 /* =====================================================================
    Helpers
@@ -863,14 +877,7 @@ const fmtTime = min => {
   return Math.floor(r / 60) + ' h ' + (r % 60 ? (r % 60) + ' min' : '');
 };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-function mulberry32(a) {
-  return function () {
-    a |= 0; a = a + 0x6D2B79F5 | 0;
-    let t = Math.imul(a ^ a >>> 15, 1 | a);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-}
+const mulberry32 = RouteCore.mulberry32;
 let toastT;
 function toast(msg, ms = 2600) {
   const el = $('#toast'); el.textContent = msg; el.classList.add('is-on');
@@ -911,7 +918,7 @@ function unproject(x, z) {
    Three.js scene
    ===================================================================== */
 const COLORS = {
-  bg: 0xe7dfcc, ground: 0xdfd3b6, road: 0xfbf7ee, water: 0x9cc2c8, green: 0xaec585,
+  bg: 0xe7dfcc, ground: 0xdfd3b6, road: 0xfbf7ee, water: 0x9cc2c8, green: 0xaec585, sand: 0xefe2bd,
   pin: 0x2a2723, pinHead: 0xd69a2f,
   hotel: 0x2f7a76, hotelRoof: 0x235e5b,
   route: 0xd9522b, routeNode: 0xb03f1e,
@@ -939,7 +946,7 @@ controls.minDistance = 12;
 controls.maxDistance = 9000;
 controls.screenSpacePanning = false;
 
-scene.add(new THREE.HemisphereLight(0xfff6e4, 0xbfae8a, 1.05));
+const hemi = new THREE.HemisphereLight(0xfff6e4, 0xbfae8a, 1.05); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff3df, 1.9);
 sun.position.set(-350, 520, 260);
 sun.castShadow = true;
@@ -950,6 +957,36 @@ sun.shadow.camera.near = 50; sun.shadow.camera.far = 2000;
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.6;
 scene.add(sun); scene.add(sun.target);
 const sunOffset = sun.position.clone();
+
+/* ---- Time of day: sun path, colours, sky ---- */
+let sceneMin = 570, sceneNight = 0;
+const DAY_BG = new THREE.Color(0xe7dfcc), DUSK_BG = new THREE.Color(0xe2b58f), NIGHT_BG = new THREE.Color(0x2c3350);
+const tmpC = new THREE.Color();
+function setSceneTime(min) {
+  sceneMin = ((min % 1440) + 1440) % 1440;
+  const h = sceneMin / 60;
+  const t = (h - 6) / 14;                       // 0 at 06:00 (sunrise) … 1 at 20:00 (sunset)
+  const elev = Math.sin(Math.PI * Math.min(1, Math.max(0, t))) * 62 * Math.PI / 180; // radians
+  const day = t < 0 || t > 1 ? 0 : Math.min(1, Math.sin(Math.PI * t) * 1.6);
+  const dusk = day > 0 && day < 0.6 ? 1 - day / 0.6 : 0;
+  sceneNight = 1 - day;
+  const az = Math.PI * (t < 0 ? 0 : t > 1 ? 1 : t);  // east → west
+  const D = 700;
+  const dir = new THREE.Vector3(-Math.cos(az) * Math.cos(elev), Math.max(0.12, Math.sin(elev)), 0.45 * Math.cos(elev)).normalize();
+  sunOffset.copy(dir.multiplyScalar(D));
+  sun.color.copy(tmpC.setHex(0xfff3df).lerp(new THREE.Color(0xffb26a), dusk)).lerp(new THREE.Color(0x9fb4ff), sceneNight > 0.9 ? 1 : 0);
+  sun.intensity = 0.15 + 1.75 * day;
+  hemi.color.copy(tmpC.setHex(0xfff6e4).lerp(new THREE.Color(0x6f7fb0), sceneNight));
+  hemi.groundColor.copy(tmpC.setHex(0xbfae8a).lerp(new THREE.Color(0x2d3350), sceneNight));
+  hemi.intensity = 0.35 + 0.7 * day;
+  const bg = tmpC.copy(DAY_BG).lerp(DUSK_BG, dusk).lerp(NIGHT_BG, sceneNight);
+  scene.background.copy(bg); scene.fog.color.copy(bg);
+  routeGroup.traverse(o => { if (o.material?.emissive) { o.material.emissive.setHex(COLORS.route); o.material.emissiveIntensity = 0.55 * sceneNight; } });
+  pinGroup.traverse(o => { if (o.material?.emissive && o.material.color) { o.material.emissive.copy(o.material.color); o.material.emissiveIntensity = 0.35 * sceneNight; } });
+  $('#time-out').textContent = hhmm(sceneMin);
+  $('#time-range').value = sceneMin;
+}
+$('#time-range').addEventListener('input', e => setSceneTime(+e.target.value));
 
 let env = null, ground = null, terrainH = () => 0, flatRadius = 1100;
 const pinGroup = new THREE.Group(); scene.add(pinGroup);
@@ -999,20 +1036,14 @@ function buildEnvironment() {
    Real map: OpenStreetMap data (Overpass API) → low-poly geometry
    Loaded in 800 m cells relative to the city centre, cached in IndexedDB.
    --------------------------------------------------------------------- */
-const CELL = 80;           // 1 cell = 80 units = 800 m
+const CELL = 80;           // 1 cell = 80 units = 800 m; the grid is offset by half a cell so the city centre sits in the middle of cell 0:0
 const CELL_REACH = 70;     // ±700 m loaded around every place
-const CENTER_REACH = 95;   // ±950 m around the city centre
+const CENTER_REACH = 79;   // ±790 m around the city centre → the 9 cells shipped in data/map-*.json
 const MAX_CELLS = 40;
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
 let overpassCursor = 0;
-const CACHE_VER = 'v2';
-const ROAD = { // class → [width (units), height]
-  motorway: [2.4, 0.20], trunk: [2.2, 0.20], primary: [1.9, 0.18], secondary: [1.6, 0.16], tertiary: [1.3, 0.14],
-  residential: [1.0, 0.12], unclassified: [1.0, 0.12], living_street: [0.9, 0.12], pedestrian: [1.1, 0.12],
-  service: [0.55, 0.10], footway: [0.35, 0.08], path: [0.3, 0.08], cycleway: [0.4, 0.08], steps: [0.35, 0.08], track: [0.4, 0.08],
-};
-const roadClass = h => { if (!h) return null; const k = h.replace(/_link$/, ''); return ROAD[k] ? k : null; };
-const GREEN_RE = /^(park|garden|pitch|playground|grass|forest|cemetery|recreation_ground|village_green|meadow|wood|scrub|beach|sand)$/;
+const CACHE_VER = 'v4';
+const { ROAD, roadClass } = RouteCore;
 
 const idb = {
   db: null,
@@ -1022,6 +1053,22 @@ const idb = {
 };
 
 const mapCells = Object.fromEntries(CITY_KEYS.map(k => [k, new Map()])); // city -> Map(cellKey -> elements[])
+const bundleLoaded = new Map(); // cityKey -> Promise
+function loadBundle(cityKey) {
+  if (!bundleLoaded.has(cityKey)) bundleLoaded.set(cityKey, (async () => {
+    try {
+      const r = await fetch(`data/map-${cityKey}.json`);
+      if (!r.ok) return;
+      const j = await r.json();
+      if (j.ver !== CACHE_VER) return;
+      const cells = mapCells[cityKey];
+      for (const [k, els] of Object.entries(j.cells)) if (!cells.has(k)) cells.set(k, els);
+      if (state.active === cityKey) rebuildMap();
+    } catch {}
+  })());
+  return bundleLoaded.get(cityKey);
+}
+let stations = []; // metro/tram/rail stops in the loaded area (active city)
 const failedCells = new Set();
 let mapLoading = false, mapDirty = false;
 const mapStatusEl = $('#map-status');
@@ -1036,51 +1083,23 @@ function neededCells() {
   mapPoints().forEach((p, idx) => {
     const q = project(p.lat, p.lon);
     const R = idx === 0 ? CENTER_REACH : CELL_REACH;
-    const cx0 = Math.floor((q.x - R) / CELL), cx1 = Math.floor((q.x + R) / CELL);
-    const cz0 = Math.floor((q.z - R) / CELL), cz1 = Math.floor((q.z + R) / CELL);
+    const cx0 = Math.floor((q.x - R + CELL / 2) / CELL), cx1 = Math.floor((q.x + R + CELL / 2) / CELL);
+    const cz0 = Math.floor((q.z - R + CELL / 2) / CELL), cz1 = Math.floor((q.z + R + CELL / 2) / CELL);
     for (let cx = cx0; cx <= cx1; cx++) for (let cz = cz0; cz <= cz1; cz++) {
       const key = cx + ':' + cz;
-      const d = Math.hypot((cx + 0.5) * CELL - q.x, (cz + 0.5) * CELL - q.z);
+      const d = Math.hypot(cx * CELL - q.x, cz * CELL - q.z);
       if (!set.has(key) || set.get(key).d > d) set.set(key, { cx, cz, d });
     }
   });
   return [...set.values()].sort((a, b) => a.d - b.d).slice(0, MAX_CELLS);
 }
 function cellBBox(cx, cz) {
-  const a = unproject(cx * CELL, (cz + 1) * CELL), b = unproject((cx + 1) * CELL, cz * CELL);
+  const x0 = cx * CELL - CELL / 2, z0 = cz * CELL - CELL / 2;
+  const a = unproject(x0, z0 + CELL), b = unproject(x0 + CELL, z0);
   return { S: a.lat, W: a.lon, N: b.lat, E: b.lon };
 }
-function buildingHeight(t, id) {
-  let m = parseFloat(t.height);
-  if (!(m > 0)) { const lv = parseFloat(t['building:levels']); if (lv > 0) m = lv * 3.2 + 1; }
-  if (!(m > 0)) m = 8 + (mulberry32(id)() * 8);
-  return Math.max(0.35, m / 10 * 1.3);
-}
-function simplify(elements) {
-  const out = [];
-  for (const el of elements) {
-    if (el.type !== 'way' || !el.geometry || el.geometry.length < 2) continue;
-    const t = el.tags || {};
-    const g = el.geometry;
-    const closed = g.length > 3 && g[0].lat === g[g.length - 1].lat && g[0].lon === g[g.length - 1].lon;
-    const pts = g.map(n => { const q = project(n.lat, n.lon); return [Math.round(q.x * 100) / 100, Math.round(q.z * 100) / 100]; });
-    if (t.building && t.building !== 'no' && closed) out.push({ id: el.id, k: 'b', h: buildingHeight(t, el.id), p: pts.slice(0, -1) });
-    else if (t.highway) { const c = roadClass(t.highway); if (c && !(t.tunnel === 'yes')) out.push({ id: el.id, k: 'r', c, p: pts }); }
-    else if (closed && (t.natural === 'water' || t.waterway === 'riverbank')) out.push({ id: el.id, k: 'w', p: pts.slice(0, -1) });
-    else if (/^(river|canal|stream)$/.test(t.waterway || '')) { let w = parseFloat(t.width) / 10; if (!(w > 0)) w = t.waterway === 'river' ? 7 : t.waterway === 'canal' ? 2.2 : 0.7; out.push({ id: el.id, k: 'wl', w, p: pts }); }
-    else if (closed && (GREEN_RE.test(t.leisure || '') || GREEN_RE.test(t.landuse || '') || GREEN_RE.test(t.natural || ''))) out.push({ id: el.id, k: 'g', p: pts.slice(0, -1) });
-  }
-  return out;
-}
-function overpassQuery(bboxes) {
-  const filters = [
-    'way["building"]', 'way["highway"]["highway"!~"construction|proposed|raceway|bus_guideway|corridor|elevator|platform"]',
-    'way["natural"="water"]', 'way["waterway"="riverbank"]', 'way["waterway"~"^(river|canal|stream)$"]', 'way["leisure"~"^(park|garden|pitch|playground)$"]',
-    'way["landuse"~"^(grass|forest|cemetery|recreation_ground|village_green|meadow)$"]', 'way["natural"~"^(wood|scrub|beach|sand)$"]',
-  ];
-  const body = bboxes.map(b => filters.map(f => `${f}(${b.S},${b.W},${b.N},${b.E});`).join('')).join('');
-  return `[out:json][timeout:90];(${body});out geom qt;`;
-}
+const simplify = els => RouteCore.simplify(els, (lat, lon) => project(lat, lon));
+const overpassQuery = RouteCore.overpassQuery;
 async function overpassFetch(q) {
   let lastErr;
   for (let attempt = 0; attempt < OVERPASS.length; attempt++) {
@@ -1100,7 +1119,7 @@ async function overpassFetch(q) {
   }
   throw lastErr;
 }
-const inBBox = (el, b) => el.geometry.some(n => n.lat >= b.S && n.lat <= b.N && n.lon >= b.W && n.lon <= b.E);
+const inBBox = (el, b) => el.type === 'node' ? (el.lat >= b.S && el.lat <= b.N && el.lon >= b.W && el.lon <= b.E) : el.geometry.some(n => n.lat >= b.S && n.lat <= b.N && n.lon >= b.W && n.lon <= b.E);
 
 async function ensureMap(force = false) {
   if (mapLoading) { mapDirty = true; return; }
@@ -1108,6 +1127,8 @@ async function ensureMap(force = false) {
   const cityKey = state.active;
   const cells = mapCells[cityKey];
   try {
+    // 0) static bundle shipped with the app (city centre, instant)
+    await loadBundle(cityKey);
     const need = neededCells();
     // 1) from cache
     const missing = [];
@@ -1125,7 +1146,7 @@ async function ensureMap(force = false) {
       const els = await overpassFetch(overpassQuery(bboxes));
       batch.forEach((c, k) => {
         const key = c.cx + ':' + c.cz;
-        const mine = simplify(els.filter(el => el.type === 'way' && el.geometry && inBBox(el, bboxes[k])));
+        const mine = simplify(els.filter(el => (el.type === 'node' && el.lat != null) || (el.type === 'way' && el.geometry)).filter(el => inBBox(el, bboxes[k])));
         cells.set(key, mine); idb.set(`${cityKey}:${key}:${CACHE_VER}`, mine); failedCells.delete(cityKey + key);
       });
     };
@@ -1159,6 +1180,7 @@ const matBuilding = new THREE.MeshStandardMaterial({ vertexColors: true, flatSha
 const matRoad = new THREE.MeshStandardMaterial({ color: COLORS.road, flatShading: true, roughness: 1, side: THREE.DoubleSide });
 const matWater = new THREE.MeshStandardMaterial({ color: COLORS.water, flatShading: true, roughness: 0.6, side: THREE.DoubleSide });
 const matGreen = new THREE.MeshStandardMaterial({ color: COLORS.green, flatShading: true, roughness: 1, side: THREE.DoubleSide });
+const matSand = new THREE.MeshStandardMaterial({ color: COLORS.sand, flatShading: true, roughness: 1, side: THREE.DoubleSide });
 
 function triangulate(pts) { // [[x,z],...] -> triangle index list
   const contour = pts.map(p => new THREE.Vector2(p[0], p[1]));
@@ -1211,25 +1233,102 @@ function makeMesh(pos, mat, col) {
   g.computeVertexNormals();
   return new THREE.Mesh(g, mat);
 }
+/* ---- Hand-made low-poly landmarks (replace the OSM footprint underneath) ---- */
+const LM = (geo, color, x = 0, y = 0, z = 0, ry = 0) => { const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.85 })); m.position.set(x, y, z); m.rotation.y = ry; m.castShadow = m.receiveShadow = true; return m; };
+const ellipseRing = (a, b, ia, ib, a0 = 0, a1 = Math.PI * 2, n = 40) => { // partial elliptical ring as a shape
+  const sh = new THREE.Shape();
+  for (let i = 0; i <= n; i++) { const t = a0 + (a1 - a0) * i / n; const x = Math.cos(t) * a, y = Math.sin(t) * b; i ? sh.lineTo(x, y) : sh.moveTo(x, y); }
+  for (let i = n; i >= 0; i--) { const t = a0 + (a1 - a0) * i / n; sh.lineTo(Math.cos(t) * ia, Math.sin(t) * ib); }
+  sh.closePath(); return sh;
+};
+const LANDMARKS = [
+  { city: 'barcelona', name: 'Sagrada Família', lat: 41.40363, lon: 2.17435, r: 11, build() {
+    const g = new THREE.Group(), stone = 0xd8c29a, dark = 0xb99f74, tip = 0xe9d9b5;
+    g.add(LM(new THREE.BoxGeometry(9, 4.6, 15), stone, 0, 2.3, 0));
+    g.add(LM(new THREE.BoxGeometry(11, 2.2, 6), dark, 0, 1.1, 0));
+    const spire = (x, z, h, r) => { g.add(LM(new THREE.CylinderGeometry(r * 0.35, r, h, 6), stone, x, h / 2, z)); g.add(LM(new THREE.ConeGeometry(r * 0.5, 1.6, 6), tip, x, h + 0.8, z)); };
+    [[-3.2, -7], [-1.1, -7.6], [1.1, -7.6], [3.2, -7], [-3.2, 7], [-1.1, 7.6], [1.1, 7.6], [3.2, 7]].forEach(([x, z]) => spire(x, z, 10, 0.9));
+    [[-4.6, 0], [4.6, 0]].forEach(([x, z]) => spire(x, z, 12, 1.1));
+    spire(0, 3.2, 13.5, 1.15); spire(0, -3.2, 13.5, 1.15);
+    spire(0, 0, 17.2, 1.5);
+    return g;
+  } },
+  { city: 'milano', name: 'Duomo di Milano', lat: 45.46420, lon: 9.19160, r: 10, build() {
+    const g = new THREE.Group(), marble = 0xf1ece2, shade = 0xdcd3c4, gold = 0xe2b64b;
+    g.add(LM(new THREE.BoxGeometry(15.8, 4.2, 9.2), marble, 0, 2.1, 0));
+    const roof = new THREE.ExtrudeGeometry(new THREE.Shape([new THREE.Vector2(-4.6, 0), new THREE.Vector2(4.6, 0), new THREE.Vector2(0, 1.6)]), { depth: 15.8, bevelEnabled: false });
+    roof.translate(0, 0, -7.9); roof.rotateY(Math.PI / 2);
+    g.add(LM(roof, shade, 0, 4.2, 0));
+    g.add(LM(new THREE.BoxGeometry(1.2, 5.6, 9.6), marble, -7.9, 2.8, 0)); // façade
+    for (let i = 0; i < 7; i++) for (const z of [-4.9, 4.9]) g.add(LM(new THREE.ConeGeometry(0.28, 2.4, 5), marble, -7 + i * 2.3, 5.4, z));
+    for (const z of [-3.2, 0, 3.2]) g.add(LM(new THREE.ConeGeometry(0.3, 2.8, 5), marble, -7.9, 6.9, z));
+    g.add(LM(new THREE.CylinderGeometry(0.5, 1.2, 4, 8), marble, 2.5, 6.6, 0));
+    g.add(LM(new THREE.ConeGeometry(0.55, 4.4, 6), marble, 2.5, 10.8, 0));
+    g.add(LM(new THREE.SphereGeometry(0.42, 6, 5), gold, 2.5, 13.2, 0)); // the Madonnina
+    return g;
+  } },
+  { city: 'roma', name: 'Colosseum', lat: 41.89021, lon: 12.49223, r: 13, build() {
+    const g = new THREE.Group(), trav = 0xd9c9a4, inner = 0xc4b08a, arena = 0xb8a27d;
+    const outer = new THREE.ExtrudeGeometry(ellipseRing(9.4, 7.8, 7.6, 6.2, -0.35, Math.PI * 1.15), { depth: 4.8, bevelEnabled: false });
+    outer.rotateX(-Math.PI / 2); g.add(LM(outer, trav, 0, 0, 0));
+    const ring2 = new THREE.ExtrudeGeometry(ellipseRing(7.7, 6.3, 5.4, 4.2), { depth: 3.0, bevelEnabled: false });
+    ring2.rotateX(-Math.PI / 2); g.add(LM(ring2, inner, 0, 0, 0));
+    const ring3 = new THREE.ExtrudeGeometry(ellipseRing(5.5, 4.3, 4.2, 3.1), { depth: 1.4, bevelEnabled: false });
+    ring3.rotateX(-Math.PI / 2); g.add(LM(ring3, inner, 0, 0, 0));
+    const floor = new THREE.CylinderGeometry(4.2, 4.2, 0.4, 24); floor.scale(1, 1, 0.74);
+    g.add(LM(floor, arena, 0, 0.2, 0));
+    return g;
+  } },
+];
+// Hand-drawn sea polygon (lat, lon) for the Barcelona shoreline; Milan and Rome have no coast in view.
+const SEA = {
+  barcelona: [[41.3625, 2.1590], [41.3700, 2.1700], [41.3735, 2.1790], [41.3763, 2.1855], [41.3805, 2.1925], [41.3858, 2.1985], [41.3928, 2.2055], [41.4000, 2.2150], [41.4085, 2.2265], [41.4150, 2.2340],
+    [41.3900, 2.3000], [41.3200, 2.2600], [41.3200, 2.1300], [41.3560, 2.1500]],
+};
+function buildLandmarks(cityKey) {
+  const grp = new THREE.Group();
+  for (const lm of LANDMARKS) {
+    if (lm.city !== cityKey) continue;
+    const g = lm.build(); const { x, z } = project(lm.lat, lm.lon);
+    g.position.set(x, terrainH(x, z), z); grp.add(g);
+  }
+  if (SEA[cityKey]) {
+    const pts = SEA[cityKey].map(([lat, lon]) => { const q = project(lat, lon); return [q.x, q.z]; });
+    const pos = []; pushFlatPolygon(pos, pts, 0.04);
+    const m = makeMesh(pos, matWater); if (m) grp.add(m);
+  }
+  return grp;
+}
+function nearLandmark(cityKey, el) {
+  if (!el.p || !el.p.length) return false;
+  let cx = 0, cz = 0; for (const [x, z] of el.p) { cx += x; cz += z; } cx /= el.p.length; cz /= el.p.length;
+  for (const lm of LANDMARKS) { if (lm.city !== cityKey) continue; const q = project(lm.lat, lm.lon); if (Math.hypot(q.x - cx, q.z - cz) < lm.r) return true; }
+  return false;
+}
 let mapStats = { buildings: 0, roads: 0 };
 function rebuildMap() {
   mapGroup.traverse(o => o.geometry?.dispose());
   mapGroup.clear();
   const seen = new Set();
-  const bPos = [], bCol = [], rPos = [], wPos = [], gPos = [];
+  const bPos = [], bCol = [], rPos = [], wPos = [], gPos = [], sPos = [];
+  stations = [];
   let nb = 0, nr = 0;
   for (const els of mapCells[state.active].values()) for (const el of els) {
     if (seen.has(el.id)) continue; seen.add(el.id);
-    if (el.k === 'b') { pushBuilding(bPos, bCol, el); nb++; }
+    if (el.k === 'b') { if (nearLandmark(state.active, el)) continue; pushBuilding(bPos, bCol, el); nb++; }
     else if (el.k === 'r') { pushRoad(rPos, el); nr++; }
     else if (el.k === 'w') pushFlatPolygon(wPos, el.p, 0.05);
     else if (el.k === 'wl') pushRoad(wPos, el, [el.w, 0.06]);
     else if (el.k === 'g') pushFlatPolygon(gPos, el.p, 0.03);
+    else if (el.k === 's') pushFlatPolygon(sPos, el.p, 0.03);
+    else if (el.k === 'st') stations.push({ name: el.n, type: el.t, lat: el.ll[0], lon: el.ll[1], x: el.p[0], z: el.p[1] });
   }
   const mb = makeMesh(bPos, matBuilding, bCol); if (mb) { mb.castShadow = true; mb.receiveShadow = true; mapGroup.add(mb); }
   const mr = makeMesh(rPos, matRoad); if (mr) { mr.receiveShadow = true; mapGroup.add(mr); }
   const mw = makeMesh(wPos, matWater); if (mw) mapGroup.add(mw);
   const mg = makeMesh(gPos, matGreen); if (mg) { mg.receiveShadow = true; mapGroup.add(mg); }
+  const ms = makeMesh(sPos, matSand); if (ms) { ms.receiveShadow = true; mapGroup.add(ms); }
+  mapGroup.add(buildLandmarks(state.active));
   mapStats = { buildings: nb, roads: nr };
 }
 
@@ -1369,7 +1468,8 @@ function rebuildPins() {
   }
   for (const p of c.places) {
     const g = makePlacePin(null, catOf(p)); placeAt(g, p.lat, p.lon);
-    g.userData.id = p.id;
+    g.userData.id = p.id; g.userData.other = (p.day || 1) !== (c.day || 1);
+    if (g.userData.other) g.scale.setScalar(PIN_SCALE * 0.6);
     pinGroup.add(g); pinObjects.set(p.id, g);
   }
   if (previewPin) pinGroup.add(previewPin);
@@ -1479,6 +1579,8 @@ function rebuildLabels() {
       else add(obj, '', ++k, CATS[catOf(s.node)].emoji + ' ' + s.node.name, s.node.id);
     });
   }
+  const cc = city();
+  for (const p of cc.places) if ((p.day || 1) !== (cc.day || 1)) { const obj = pinObjects.get(p.id); if (obj) add(obj, 'is-other', 'D' + p.day, CATS[catOf(p)].emoji + ' ' + p.name, p.id); }
   if (previewPin) add(previewPin, 'is-preview', '?', 'Preview');
   if (typeof meGroup !== 'undefined' && meGroup.visible) add(meGroup, 'is-me', '●', 'You are here');
 }
@@ -1558,7 +1660,7 @@ canvas.addEventListener('pointerup', e => {
 
 function selectPlace(id, fly = false) {
   selectedId = id;
-  for (const [pid, g] of pinObjects) g.scale.setScalar(pid === id ? PIN_SCALE * 1.3 : PIN_SCALE);
+  for (const [pid, g] of pinObjects) g.scale.setScalar((pid === id ? 1.3 : 1) * (g.userData.other ? 0.6 : 1) * PIN_SCALE);
   document.querySelectorAll('.step').forEach(el => el.classList.toggle('is-selected', el.dataset.id === id));
   rebuildLabels();
   const el = document.querySelector(`.step[data-id="${id}"]`);
@@ -1585,6 +1687,7 @@ function animate(now) {
     if (k >= 1) { fades.splice(i, 1); f.onDone?.(); }
   }
   if (previewPin) { const s = PIN_SCALE * (1 + Math.sin(now / 220) * 0.08); previewPin.scale.setScalar(s); }
+  walkTick(dt, now);
   controls.update();
   sun.position.copy(controls.target).add(sunOffset); sun.target.position.copy(controls.target);
   const cd = camera.position.distanceTo(controls.target);
@@ -1615,7 +1718,7 @@ async function photonSearch(q, cityKey) {
     const [lon, lat] = f.geometry.coordinates; const pr = f.properties || {};
     if (haversine({ lat, lon }, def.center) > 35000) continue;
     const addr = [pr.street ? (pr.street + (pr.housenumber ? ' ' + pr.housenumber : '')) : '', [pr.postcode, pr.city || pr.county].filter(Boolean).join(' ')].filter(Boolean).join(', ');
-    out.push({ lat, lon, name: pr.name || '', address: [pr.name, addr].filter(Boolean).join(', '), cat: catFromOsm(pr.osm_key, pr.osm_value), kind: pr.osm_value || '' });
+    out.push({ lat, lon, name: pr.name || '', address: [pr.name, addr].filter(Boolean).join(', '), cat: catFromOsm(pr.osm_key, pr.osm_value), kind: pr.osm_value || '', osm: pr.osm_type && pr.osm_id ? pr.osm_type + pr.osm_id : null, hours: '' });
     if (out.length >= 3) break;
   }
   return out;
@@ -1624,12 +1727,12 @@ async function nominatimSearch(q, cityKey) {
   const wait = 1100 - (Date.now() - geo.last);
   if (wait > 0) await sleep(wait);
   const def = CITIES[cityKey];
-  const params = new URLSearchParams({ format: 'jsonv2', limit: '3', 'accept-language': 'en', viewbox: def.viewbox.join(','), bounded: '1', q: cityQuery(q, def) });
+  const params = new URLSearchParams({ format: 'jsonv2', limit: '3', 'accept-language': 'en', extratags: '1', viewbox: def.viewbox.join(','), bounded: '1', q: cityQuery(q, def) });
   geo.last = Date.now();
   const res = await fetch('https://nominatim.openstreetmap.org/search?' + params.toString(), { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error('Nominatim ' + res.status);
   const data = await res.json();
-  return data.map(d => ({ lat: +d.lat, lon: +d.lon, name: d.name || '', address: d.display_name, cat: catFromOsm(d.category, d.type), kind: d.type || '' }));
+  return data.map(d => ({ lat: +d.lat, lon: +d.lon, name: d.name || '', address: d.display_name, cat: catFromOsm(d.category, d.type), kind: d.type || '', osm: d.osm_type && d.osm_id ? d.osm_type[0].toUpperCase() + d.osm_id : null, hours: d.extratags?.opening_hours || '' }));
 }
 // Returns candidates: Photon first (forgiving with names), then Nominatim (strong with addresses)
 function geocodeMulti(q, cityKey) {
@@ -1641,28 +1744,23 @@ function geocodeMulti(q, cityKey) {
   });
 }
 async function geocode(q, cityKey) { const r = await geocodeMulti(q, cityKey); return r[0] || null; }
+// Opening hours for a saved place (Nominatim lookup by OSM id, queued like the other requests)
+async function fetchHours(place) {
+  try {
+    const d = await queued(async () => {
+      const wait = 1100 - (Date.now() - geo.last); if (wait > 0) await sleep(wait);
+      geo.last = Date.now();
+      const res = await fetch('https://nominatim.openstreetmap.org/lookup?' + new URLSearchParams({ osm_ids: place.osm, format: 'jsonv2', extratags: '1' }));
+      if (!res.ok) throw new Error('lookup ' + res.status);
+      return (await res.json())[0];
+    });
+    const h = d?.extratags?.opening_hours;
+    if (h && !place.hours) { place.hours = h; save(); recompute(); toast(`Opening hours found for ${place.name}.`); }
+  } catch {}
+}
 
 // Extract address/place-like lines from pasted text (e.g. an Instagram caption)
-function extractCandidates(text) {
-  const parts = text.split(/\n|•|\||·|\s{2,}|(?<=[.!?])\s+/).map(l => l.trim()).filter(Boolean);
-  const cands = [];
-  for (const l of parts) {
-    let t = l.replace(/https?:\/\/\S+/g, '').replace(/[#@]\S+/g, '').replace(/[📍🗺️➡️👉✨🔥❤️🍴🍽️☕🍸\-–—*:>]+/g, ' ').replace(/\s+/g, ' ').trim();
-    t = t.replace(/^(adres|address|dirección|indirizzo|where|nerede)\s*[:\-]?\s*/i, '');
-    if (t.length < 3 || t.length > 90) continue;
-    let score = 0;
-    if (/📍/.test(l)) score += 3;
-    if (/\b(carrer|calle|via|viale|piazza|plaça|plaza|passeig|avinguda|avenida|corso|largo|vicolo|rambla|ronda|travessera|street|road|c\/)\b/i.test(t)) score += 2;
-    if (/\b\d{5}\b/.test(t)) score += 1;
-    if (/\b(restaurant|ristorante|restaurante|bar|caf[eèé]|trattoria|osteria|pizzeria|gelateria|tapas|bistro|bakery|forn|pastisseria|pasticceria|bodega|taverna|cantina|enoteca)\b/i.test(t)) score += 1;
-    if (/\b(barcelona|milano|milan|roma|rome)\b/i.test(t)) score += 1;
-    cands.push({ t, score });
-  }
-  const scored = cands.filter(c => c.score > 0).sort((a, b) => b.score - a.score).slice(0, 4);
-  const plain = cands.filter(c => c.score === 0).slice(0, 2);
-  const seen = new Set();
-  return [...scored, ...plain].map(c => c.t).filter(t => { const k = t.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
-}
+const extractCandidates = RouteCore.extractCandidates;
 
 /* =====================================================================
    UI: city tabs, panel pages
@@ -1676,11 +1774,13 @@ CITY_KEYS.forEach(k => {
 });
 function switchCity(k) {
   if (state.active !== k) { state.active = k; save(); }
+  if (typeof walk !== 'undefined' && walk.on) walkStop();
   setPreview(null); selectedId = null;
   document.querySelectorAll('.city-tab').forEach(b => b.classList.toggle('is-active', b.dataset.city === k));
   $('#route-title').textContent = CITIES[k].name + ' — walking route';
   buildEnvironment();
   rebuildMap(); setMapStatus('');
+  loadBundle(k);
   rebuildPins();
   renderTransit(); renderTickets();
   recompute(false);
@@ -1710,19 +1810,7 @@ function saveLegs() {
   } catch {}
 }
 const legKey = (a, b) => `${a.lat.toFixed(5)},${a.lon.toFixed(5)}|${b.lat.toFixed(5)},${b.lon.toFixed(5)}`;
-function decodePolyline(str, prec = 1e6) {
-  let i = 0, lat = 0, lon = 0; const out = [];
-  while (i < str.length) {
-    let b, sh = 0, r = 0;
-    do { b = str.charCodeAt(i++) - 63; r |= (b & 0x1f) << sh; sh += 5; } while (b >= 0x20);
-    lat += (r & 1) ? ~(r >> 1) : (r >> 1);
-    sh = 0; r = 0;
-    do { b = str.charCodeAt(i++) - 63; r |= (b & 0x1f) << sh; sh += 5; } while (b >= 0x20);
-    lon += (r & 1) ? ~(r >> 1) : (r >> 1);
-    out.push([lat / prec, lon / prec]);
-  }
-  return out;
-}
+const decodePolyline = RouteCore.decodePolyline;
 async function fetchLeg(a, b) {
   const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), 30000);
   try {
@@ -1780,8 +1868,25 @@ function recompute(animate = true) {
   updateNav();
   fetchMissingLegs(currentRoute);
 }
+function nearestStation(pt, maxM = 700) {
+  let best = null, bd = maxM;
+  for (const st of stations) { const d = haversine(pt, st); if (d < bd) { bd = d; best = { ...st, d }; } }
+  return best;
+}
+const stIcon = t => t === 'subway' ? 'Ⓜ' : t === 'tram' ? '🚋' : '🚆';
+function renderDayBar(c) {
+  const bar = $('#day-bar');
+  const counts = {}; c.places.forEach(p => { counts[p.day || 1] = (counts[p.day || 1] || 0) + 1; });
+  bar.innerHTML = Array.from({ length: c.days || 1 }, (_, i) => i + 1).map(d =>
+    `<button type="button" data-day="${d}" class="${d === (c.day || 1) ? 'is-on' : ''}">Day ${d}<span class="cnt">${counts[d] || 0}</span></button>`).join('')
+    + `<button type="button" data-day="new" title="Add a day">+ Day</button>`;
+  $('#trip-date').value = c.date || todayISO();
+  $('#trip-start').value = hhmm(c.startMin ?? 570);
+}
 function renderRoute(route) {
   const c = city();
+  renderDayBar(c);
+  const dayPlaces = dayPlacesOf(c);
   const sum = $('#route-summary');
   const stepsEl = $('#steps');
   const emptyEl = $('#route-empty');
@@ -1791,7 +1896,7 @@ function renderRoute(route) {
   if (c.hotel) {
     hc.innerHTML = `<div class="hotel-card">
       <div class="mark">O</div>
-      <div class="body"><div class="name">${esc(c.hotel.name)}</div><div class="addr">${esc(c.hotel.address || fmtLatLon(c.hotel))}</div>${c.hotel.note ? `<div class="note">${esc(c.hotel.note)}</div>` : ''}</div>
+      <div class="body"><div class="name">${esc(c.hotel.name)}</div><div class="addr">${esc(c.hotel.address || fmtLatLon(c.hotel))}</div>${c.hotel.note ? `<div class="note">${esc(c.hotel.note)}</div>` : ''}<div class="times">Day ${c.day || 1} starts at <b>${hhmm(c.startMin ?? 570)}</b></div></div>
       <button class="icon-btn" data-act="edit-hotel" title="Edit">✎</button>
       <button class="icon-btn" data-act="del-hotel" title="Remove hotel">×</button>
     </div>`;
@@ -1802,17 +1907,21 @@ function renderRoute(route) {
     </div>`;
   }
 
-  if (!route || !c.places.length) {
-    sum.innerHTML = `<div><b>0</b><span>places</span></div><div><b>—</b><span>total distance</span></div><div><b>—</b><span>walking time</span></div>`;
+  if (!route || !dayPlaces.length) {
+    sum.innerHTML = `<div><b>0</b><span>places</span></div><div><b>—</b><span>total distance</span></div><div><b>—</b><span>walking time</span></div><div><b>—</b><span>day ends</span></div>`;
     stepsEl.innerHTML = '';
-    emptyEl.innerHTML = `<div class="empty"><b>The notebook is empty</b>Add the first place by tapping the ground in the scene or from the <button class="btn btn-sm btn-ghost" data-act="go-add" style="vertical-align:middle">Add</button> tab.</div>`;
+    emptyEl.innerHTML = c.places.length
+      ? `<div class="empty"><b>Nothing on Day ${c.day || 1} yet</b>Edit a place (✎) and move it to this day, or add a new one from the <button class="btn btn-sm btn-ghost" data-act="go-add" style="vertical-align:middle">Add</button> tab.</div>`
+      : `<div class="empty"><b>The notebook is empty</b>Add the first place by tapping the ground in the scene or from the <button class="btn btn-sm btn-ghost" data-act="go-add" style="vertical-align:middle">Add</button> tab.</div>`;
     return;
   }
   emptyEl.innerHTML = '';
   const approx = route.steps.some((s, i) => i > 0 && !s.leg) ? '~' : '';
-  sum.innerHTML = `<div><b>${c.places.length}</b><span>${c.places.length === 1 ? 'place' : 'places'}</span></div>
+  const sc = route.sched;
+  sum.innerHTML = `<div><b>${dayPlaces.length}</b><span>${dayPlaces.length === 1 ? 'place' : 'places'}</span></div>
     <div><b>${approx}${fmtDist(route.totalDist)}</b><span>total distance</span></div>
-    <div><b>${approx}${fmtTime(route.totalTime)}</b><span>walking time</span></div>`;
+    <div><b>${approx}${fmtTime(route.totalTime)}</b><span>walking time</span></div>
+    <div><b>${hhmm(sc.endMin)}</b><span>day ends${sc.closedCount ? ` · ${sc.closedCount} closed` : ''}</span></div>`;
 
   let k = 0;
   stepsEl.innerHTML = route.steps.map((s, i) => {
@@ -1822,8 +1931,17 @@ function renderRoute(route) {
     const gmaps = `https://www.google.com/maps/dir/?api=1&destination=${n.lat},${n.lon}&travelmode=walking`;
     const dirs = s.leg && s.leg.man.length
       ? `<details class="dirs"><summary>directions (${s.leg.man.length} steps)</summary><ol>${s.leg.man.map(([t, m]) => `<li>${esc(t)}${m ? `<small>${fmtDist(m)}</small>` : ''}</li>`).join('')}</ol></details>` : '';
-    const leg = i === 0 ? `<div class="leg"><b>Start</b> — no hotel, so the route starts at the first added place</div>`
-      : `<div class="leg">${s.leg ? '' : '~'}${fmtDist(s.distM)} · <b>${fmtTime(s.timeMin)}</b> ${s.leg ? 'walk via streets' : 'straight-line estimate'}<a class="gmaps" href="${gmaps}" target="_blank" rel="noopener">Open in Google Maps</a>${s.warn ? `<span class="warn">long leg — consider public transport <button data-act="go-tickets">tickets</button></span>` : ''}${dirs}</div>`;
+    const it = route.sched.items[i], prev = i > 0 ? route.steps[i - 1].node : null;
+    let transit = '';
+    if (s.warn && prev) {
+      const sa = nearestStation(prev), sb = nearestStation(n);
+      const tl = `https://www.google.com/maps/dir/?api=1&origin=${prev.lat},${prev.lon}&destination=${n.lat},${n.lon}&travelmode=transit`;
+      transit = `<span class="warn">long leg — ${sa && sb && sa.name !== sb.name ? `${stIcon(sa.type)} ${esc(sa.name)} → ${stIcon(sb.type)} ${esc(sb.name)}` : 'consider public transport'}<a href="${tl}" target="_blank" rel="noopener">transit route</a> <button data-act="go-tickets">tickets</button></span>`;
+    }
+    const times = `<div class="times">${hhmm(it.arrive)} – ${hhmm(it.depart)} · stays ${it.stay} min${it.wait ? `<span class="wait"> · waits ${it.wait} min, opens ${hhmm(it.opensAt)}</span>` : ''}${it.closed ? ' · <b class="closed">closed at this time</b>' : ''}${!it.closed && it.closes != null && it.closes - it.arrive < 45 ? ` · <b class="closed">closes ${hhmm(it.closes)}</b>` : ''}${n.hours ? `<span class="hours">⏰ ${esc(n.hours)}</span>` : ''}</div>`;
+    const why = `<div class="why">${esc(RouteCore.explainStep(route.steps, i, it))}</div>`;
+    const leg = i === 0 ? `<div class="leg"><b>Start</b> — no hotel, so the route starts at the first added place${times}${why}</div>`
+      : `<div class="leg">${s.leg ? '' : '~'}${fmtDist(s.distM)} · <b>${fmtTime(s.timeMin)}</b> ${s.leg ? 'walk via streets' : 'straight-line estimate'}<a class="gmaps" href="${gmaps}" target="_blank" rel="noopener">Open in Google Maps</a>${transit}${dirs}${times}${why}</div>`;
     const meter = Array.from({ length: 10 }, (_, j) => `<i class="${j < n.priority ? 'on' : ''}"></i>`).join('');
     return `<li class="step ${i === 0 ? 'is-start' : ''} ${n.id === selectedId ? 'is-selected' : ''}" data-id="${n.id}">
       ${leg}
@@ -1873,11 +1991,22 @@ $('#panel-body').addEventListener('click', async e => {
     }
   } else if (act === 'focus') {
     selectPlace(id, true);
+    const k = currentRoute?.steps.findIndex(st => st.node.id === id);
+    if (k >= 0 && currentRoute.sched) setSceneTime(currentRoute.sched.items[k].arrive);
   } else if (act === 'edit') {
     openSheet(p, p.name, { edit: p });
   }
 });
 
+$('#day-bar').addEventListener('click', e => {
+  const b = e.target.closest('button[data-day]'); if (!b) return;
+  const c = city();
+  if (b.dataset.day === 'new') { c.days = (c.days || 1) + 1; c.day = c.days; }
+  else c.day = +b.dataset.day;
+  save(); rebuildPins(); recompute(); fitAll();
+});
+$('#trip-date').addEventListener('change', e => { city().date = e.target.value || todayISO(); save(); recompute(); });
+$('#trip-start').addEventListener('change', e => { const [h, m] = (e.target.value || '09:30').split(':').map(Number); city().startMin = h * 60 + m; save(); recompute(); setSceneTime(city().startMin); });
 $('#clear-city').onclick = async () => {
   const c = city();
   if (!c.hotel && !c.places.length) return toast('Nothing to clear in this city.');
@@ -1895,12 +2024,18 @@ $('#map-btn').onclick = () => { failedCells.clear(); ensureMap(true); toast('Rel
    ===================================================================== */
 let pending = null; // {lat, lon, address, name}
 let sheetType = 'place';
-let editing = null, editingHotel = false, sheetCat = 'sight';
+let editing = null, editingHotel = false, sheetCat = 'sight', sheetDay = 1;
+const dayBox = $('#f-day');
+function renderSheetDays(c) {
+  const n = Math.max(c.days || 1, sheetDay);
+  dayBox.innerHTML = Array.from({ length: n + 1 }, (_, i) => i + 1).map(d => `<button type="button" data-v="${d}" class="${d === sheetDay ? 'is-on' : ''}">${d === n + 1 ? '+ Day ' + d : 'Day ' + d}</button>`).join('');
+}
+dayBox.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; sheetDay = +b.dataset.v; renderSheetDays(city()); });
 const sheetVeil = $('#sheet-veil');
 const catBox = $('#f-cat');
 catBox.innerHTML = Object.entries(CATS).map(([k, c]) => `<button type="button" data-v="${k}">${c.emoji} ${esc(c.label)}</button>`).join('');
 function setSheetCat(k) { sheetCat = CATS[k] ? k : 'sight'; catBox.querySelectorAll('button').forEach(b => b.classList.toggle('is-on', b.dataset.v === sheetCat)); }
-catBox.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSheetCat(b.dataset.v); });
+catBox.addEventListener('click', e => { const b = e.target.closest('button'); if (b) { setSheetCat(b.dataset.v); $('#f-stay').placeholder = String(CATS[sheetCat].stay); } });
 function openSheet(loc, presetName = '', opts = {}) {
   pending = loc;
   editing = opts.edit || null; editingHotel = !!opts.hotel;
@@ -1909,6 +2044,9 @@ function openSheet(loc, presetName = '', opts = {}) {
   const pr = editing?.priority ?? 5;
   $('#f-prio').value = pr; $('#f-prio-out').textContent = pr;
   setSheetCat(editing ? catOf(editing) : (opts.cat || loc.cat || 'sight'));
+  sheetDay = editing ? (editing.day || 1) : (city().day || 1); renderSheetDays(city());
+  $('#f-stay').value = editing?.stay || ''; $('#f-stay').placeholder = String(CATS[sheetCat].stay);
+  $('#f-hours').value = editing ? (editing.hours || '') : (loc.hours || '');
   setSheetType(editingHotel ? 'hotel' : 'place');
   $('#f-type').closest('.field').style.display = editing ? 'none' : '';
   if (editing) $('#sheet-title').textContent = editingHotel ? 'Edit hotel' : 'Edit place';
@@ -1922,6 +2060,7 @@ function setSheetType(t) {
   $('#f-type').querySelectorAll('button').forEach(b => b.classList.toggle('is-on', b.dataset.v === t));
   $('#f-prio-field').style.display = t === 'hotel' ? 'none' : '';
   $('#f-cat-field').style.display = t === 'hotel' ? 'none' : '';
+  for (const id of ['f-day-field', 'f-stay-field', 'f-hours-field']) $('#' + id).style.display = t === 'hotel' ? 'none' : '';
   $('#sheet-title').textContent = t === 'hotel' ? 'Mark hotel' : 'New place';
 }
 $('#f-type').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSheetType(b.dataset.v); });
@@ -1938,7 +2077,11 @@ $('#sheet').addEventListener('submit', async e => {
   const c = city();
   if (editing) {
     editing.name = name; editing.note = note;
-    if (!editingHotel) { editing.priority = +$('#f-prio').value || 5; editing.cat = sheetCat; }
+    if (!editingHotel) {
+      editing.priority = +$('#f-prio').value || 5; editing.cat = sheetCat; editing.day = sheetDay;
+      editing.stay = +$('#f-stay').value || 0; editing.hours = $('#f-hours').value.trim();
+      c.days = Math.max(c.days || 1, sheetDay);
+    }
     closeSheet(); save(); rebuildPins(); recompute(); toast('Updated.');
     return;
   }
@@ -1949,12 +2092,94 @@ $('#sheet').addEventListener('submit', async e => {
     toast('Hotel marked — the route starts here.');
   } else {
     const priority = +$('#f-prio').value || 5;
-    c.places.push({ id: uid(), name, note, cat: sheetCat, lat: loc.lat, lon: loc.lon, address: loc.address || '', priority });
-    toast(`"${name}" added.`);
+    const place = { id: uid(), name, note, cat: sheetCat, day: sheetDay, stay: +$('#f-stay').value || 0, hours: $('#f-hours').value.trim(), osm: loc.osm || null, lat: loc.lat, lon: loc.lon, address: loc.address || '', priority };
+    c.places.push(place); c.days = Math.max(c.days || 1, sheetDay);
+    if (!place.hours && place.osm) fetchHours(place);
+    toast(`"${name}" added${sheetDay !== (c.day || 1) ? ` to Day ${sheetDay}` : ''}.`);
   }
   save(); setPreview(null); rebuildPins(); recompute(); fitAll();
   showPage('route');
 });
+
+/* =====================================================================
+   Walk the route: a little figure follows the legs, pauses at each stop
+   ===================================================================== */
+const walker = new THREE.Group();
+{
+  const body = LM(new THREE.CylinderGeometry(0.55, 0.7, 1.5, 6), 0xd9522b, 0, 0.75, 0);
+  const head = LM(new THREE.SphereGeometry(0.5, 6, 5), 0xf3dcc2, 0, 1.85, 0);
+  const hat = LM(new THREE.ConeGeometry(0.62, 0.55, 6), 0x2a2723, 0, 2.35, 0);
+  const bag = LM(new THREE.BoxGeometry(0.5, 0.7, 0.35), 0x2f7a76, 0, 0.9, -0.55);
+  walker.add(body, head, hat, bag); walker.visible = false; walker.userData.top = 2.8;
+  scene.add(walker);
+}
+const walk = { on: false, path: [], cum: [], stops: [], pos: 0, speed: 20, pauseUntil: 0, stopIdx: -1, follow: true };
+function buildWalkPath(route) {
+  const path = [], cum = [], stops = [];
+  let acc = 0;
+  const push = v => { if (path.length) acc += v.distanceTo(path[path.length - 1]); path.push(v); cum.push(acc); };
+  route.steps.forEach((st, k) => {
+    const pts = k === 0 ? [[st.node.lat, st.node.lon]] : (st.leg ? st.leg.shape : [[route.steps[k - 1].node.lat, route.steps[k - 1].node.lon], [st.node.lat, st.node.lon]]);
+    for (const [lat, lon] of pts) { const q = project(lat, lon); push(new THREE.Vector3(q.x, terrainH(q.x, q.z) + 0.4, q.z)); }
+    stops.push({ at: acc, step: st, k });
+  });
+  return { path, cum, stops };
+}
+function walkStart() {
+  if (!currentRoute || currentRoute.steps.length < 2) return toast('Add at least two stops to walk the route.');
+  Object.assign(walk, buildWalkPath(currentRoute), { on: true, pos: 0, pauseUntil: 0, stopIdx: -1, follow: true });
+  walker.visible = true; walker.position.copy(walk.path[0]);
+  $('#walk-btn').classList.add('is-on'); $('#walk-btn').textContent = '■ Stop';
+  flyTo(walk.path[0], 90);
+  setSceneTime(currentRoute.sched.items[0].arrive);
+}
+function walkStop() {
+  walk.on = false; walker.visible = false; walkBubble(null);
+  $('#walk-btn').classList.remove('is-on'); $('#walk-btn').textContent = '▶ Walk';
+}
+$('#walk-btn').onclick = () => walk.on ? walkStop() : walkStart();
+let bubbleEl = null;
+function walkBubble(step) {
+  if (bubbleEl) { bubbleEl.remove(); bubbleEl = null; labelEntries = labelEntries.filter(e => e.obj !== walker); }
+  if (!step) return;
+  const n = step.node;
+  bubbleEl = document.createElement('div');
+  bubbleEl.className = 'lbl is-bubble';
+  bubbleEl.innerHTML = `<span class="n">${n.isHotel ? 'H' : esc(String(step.k))}</span><span class="t">${esc(n.name)}${n.note ? `<small>${esc(n.note)}</small>` : ''}</span>`;
+  labelsEl.appendChild(bubbleEl);
+  labelEntries.push({ el: bubbleEl, obj: walker });
+}
+function walkTick(dt, now) {
+  if (!walk.on) return;
+  const sched = currentRoute?.sched;
+  if (now < walk.pauseUntil) return;
+  const total = walk.cum[walk.cum.length - 1];
+  const unitsPerSec = (4.8 * 1000 / 3600) * walk.speed * SCALE; // real walking speed × factor, in scene units
+  walk.pos = Math.min(total, walk.pos + unitsPerSec * dt / 1000);
+  // position along the polyline
+  let i = 1; while (i < walk.cum.length && walk.cum[i] < walk.pos) i++;
+  const a = walk.path[Math.max(0, i - 1)], b = walk.path[Math.min(walk.path.length - 1, i)];
+  const segLen = walk.cum[Math.min(walk.cum.length - 1, i)] - walk.cum[Math.max(0, i - 1)];
+  const t = segLen > 0 ? (walk.pos - walk.cum[Math.max(0, i - 1)]) / segLen : 1;
+  walker.position.lerpVectors(a, b, t);
+  if (segLen > 0) walker.rotation.y = Math.atan2(b.x - a.x, b.z - a.z);
+  walker.position.y += Math.abs(Math.sin(now / 90)) * 0.12; // little bob
+  if (walk.follow && !camTween) { const d = walker.position.clone().sub(controls.target); controls.target.add(d); camera.position.add(d); }
+  // arrive at a stop?
+  const next = walk.stops.findIndex((st, k) => k > walk.stopIdx && walk.pos >= st.at - 0.01);
+  if (next >= 0) {
+    walk.stopIdx = next; const st = walk.stops[next];
+    walkBubble(st.step);
+    if (sched) setSceneTime(sched.items[st.k].arrive);
+    walk.pauseUntil = now + 2200;
+    if (next === walk.stops.length - 1) setTimeout(() => { if (walk.on && walk.stopIdx === next) walkStop(); }, 4000);
+  } else if (sched) {
+    // scene clock interpolates between stops
+    const prev = walk.stops[Math.max(0, walk.stopIdx)], nxt = walk.stops[Math.min(walk.stops.length - 1, walk.stopIdx + 1)];
+    if (nxt.at > prev.at) { const f = (walk.pos - prev.at) / (nxt.at - prev.at); setSceneTime(sched.items[prev.k].depart + (sched.items[nxt.k].arrive - sched.items[prev.k].depart) * f); }
+  }
+}
+controls.addEventListener('start', () => { walk.follow = false; });
 
 /* =====================================================================
    Live location: "you are here" marker, next stop, directions
@@ -2017,13 +2242,15 @@ const status = $('#scene-status');
 function setStatus(msg) { status.textContent = msg || ''; status.classList.toggle('is-on', !!msg); }
 let searchResults = [], searchPick = 0;
 function renderCandidates(results, hint) {
+  const ctr = cityDef().center;
+  results = results.map(r => ({ ...r, farKm: haversine(r, ctr) / 1000 })).sort((a, b) => (a.farKm > 10) - (b.farKm > 10));
   searchResults = results; searchPick = 0;
   const box = $('#preview');
   if (!results.length) { box.innerHTML = `<div class="preview-card">Not found. Try a shorter place name, add street + number, or add the city name.</div>`; setPreview(null); return; }
   setPreview(results[0]);
   box.innerHTML = `<div class="preview-card">
     ${hint ? `<div class="addr">${esc(hint)}</div>` : ''}
-    <div class="cands">${results.map((r, i) => `<button type="button" class="cand ${i === 0 ? 'is-on' : ''}" data-i="${i}"><span class="ico">${CATS[r.cat].emoji}</span><span><b>${esc(r.name || r.address)}</b><small>${esc(CATS[r.cat].label)}${r.kind ? ' · ' + esc(r.kind) : ''} · ${esc(r.address)}</small></span></button>`).join('')}</div>
+    <div class="cands">${results.map((r, i) => `<button type="button" class="cand ${i === 0 ? 'is-on' : ''}" data-i="${i}"><span class="ico">${CATS[r.cat].emoji}</span><span><b>${esc(r.name || r.address)}</b><small>${esc(CATS[r.cat].label)}${r.kind ? ' · ' + esc(r.kind) : ''} · ${esc(r.address)}</small>${r.farKm > 10 ? `<small style="color:var(--danger)">⚠ ${r.farKm.toFixed(0)} km from the centre — probably not the place you mean</small>` : ''}</span></button>`).join('')}</div>
     <div class="row"><button class="btn btn-primary btn-sm" id="pv-use">Use this location</button><button class="btn btn-ghost btn-sm" id="pv-drop">Cancel</button></div>
   </div>`;
   box.querySelectorAll('.cand').forEach(b => b.onclick = () => {
@@ -2103,7 +2330,9 @@ $('#bulk-go').onclick = async () => {
       let res = await geocode(r.addr, cityKey);
       if (!res) res = await geocode(r.name + ' ' + r.addr, cityKey);
       if (!res) { markErr(r.row, 'Address not found — fix it and try again.'); fail++; continue; }
-      state.cities[cityKey].places.push({ id: uid(), name: r.name, cat: res.cat || 'sight', lat: res.lat, lon: res.lon, address: res.address, priority: r.score });
+      const place = { id: uid(), name: r.name, cat: res.cat || 'sight', day: state.cities[cityKey].day || 1, stay: 0, hours: res.hours || '', osm: res.osm || null, lat: res.lat, lon: res.lon, address: res.address, priority: r.score };
+      state.cities[cityKey].places.push(place);
+      if (!place.hours && place.osm) fetchHours(place);
       save(); r.row.remove(); ok++;
       if (cityKey === state.active) { rebuildPins(); recompute(); }
     } catch (err) { markErr(r.row, 'Lookup error: ' + err.message); fail++; }
@@ -2142,6 +2371,7 @@ function renderTickets() {
    Start
    ===================================================================== */
 switchCity(state.active);
+setSceneTime(city().startMin ?? 570);
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(() => {});
 </script>
 </body>

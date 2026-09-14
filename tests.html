@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Route Notebook tests</title>
+<style>
+  body{font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;margin:24px;color:#2a2723;background:#f4eee2}
+  h1{font-size:18px}
+  .ok{color:#2f7a4a}.fail{color:#a93a2c;font-weight:700}
+  #summary{margin-top:14px;font-weight:700}
+</style>
+<script src="core.js"></script>
+</head>
+<body>
+<h1>Route Notebook — core tests</h1>
+<ol id="out"></ol>
+<div id="summary"></div>
+<script>
+const C = RouteCore, out = document.getElementById('out');
+let pass = 0, fail = 0;
+function t(name, fn) {
+  const li = document.createElement('li');
+  try { fn(); li.textContent = 'ok  ' + name; li.className = 'ok'; pass++; }
+  catch (e) { li.textContent = 'FAIL ' + name + ' — ' + e.message; li.className = 'fail'; fail++; }
+  out.appendChild(li);
+}
+const eq = (a, b, msg) => { if (a !== b) throw new Error((msg || '') + ' expected ' + JSON.stringify(b) + ' got ' + JSON.stringify(a)); };
+const near = (a, b, tol, msg) => { if (Math.abs(a - b) > tol) throw new Error((msg || '') + ' expected ~' + b + ' got ' + a); };
+
+t('haversine: 0.01° latitude ≈ 1112 m', () => near(C.haversine({ lat: 0, lon: 0 }, { lat: 0.01, lon: 0 }), 1112, 2));
+t('walkEstimate: 1.3× detour, 80 m/min', () => { const w = C.walkEstimate(1000); eq(w.distM, 1300); near(w.timeMin, 16.25, 0.01); });
+t('priorityFactor: 1 → 0.6, 10 → 1.5, default 5 → 1.0', () => { eq(C.priorityFactor(1), 0.6); eq(C.priorityFactor(10), 1.5); eq(C.priorityFactor(), 1.0); });
+
+const hotel = { id: 'h', name: 'H', lat: 41.3874, lon: 2.1686 };
+const P = (n, lat, lon, pr) => ({ id: n, name: n, lat, lon, priority: pr });
+t('route: starts at hotel, nearest first, far leg flagged', () => {
+  const r = C.computeRoute({ hotel, places: [P('A', 41.3919, 2.1686, 5), P('B', 41.4144, 2.1686, 10), P('C', 41.3874, 2.1830, 1)] });
+  eq(r.steps.map(s => s.node.name).join('>'), 'H>A>C>B');
+  eq(r.steps[3].warn, true, 'B leg > 1800 m');
+  eq(r.startIsHotel, true);
+});
+t('route: without hotel starts at the first added place', () => {
+  const r = C.computeRoute({ hotel: null, places: [P('A', 41.3919, 2.1686, 5), P('B', 41.4144, 2.1686, 10)] });
+  eq(r.steps[0].node.name, 'A'); eq(r.startIsHotel, false);
+});
+t('route: empty city → null, hotel only → 1 step', () => {
+  eq(C.computeRoute({ hotel: null, places: [] }), null);
+  eq(C.computeRoute({ hotel, places: [] }).steps.length, 1);
+});
+t('route: 2-opt removes a crossing', () => {
+  const r = C.computeRoute({ hotel, places: [P('p1', 41.3874, 2.1786, 5), P('p2', 41.3964, 2.1686, 5), P('p3', 41.3964, 2.1786, 5), P('p4', 41.3874, 2.1886, 5)] });
+  eq(r.steps.map(s => s.node.name).join('>'), 'H>p1>p4>p3>p2');
+});
+t('route: legOf overrides displayed distance/time', () => {
+  const r = C.computeRoute({ hotel, places: [P('A', 41.3919, 2.1686, 5)] }, { legOf: () => ({ shape: [[0, 0]], distM: 999, timeMin: 12 }) });
+  eq(r.steps[1].distM, 999); eq(r.steps[1].timeMin, 12); eq(r.totalDist, 999);
+});
+t('priority pulls a place earlier', () => {
+  // D is slightly farther than E but has priority 10 vs 1
+  const r = C.computeRoute({ hotel, places: [P('E', 41.3910, 2.1686, 1), P('D', 41.3920, 2.1700, 10)] });
+  eq(r.steps[1].node.name, 'D');
+});
+
+t('decodePolyline: Google reference example (1e5)', () => {
+  const pts = C.decodePolyline('_p~iF~ps|U_ulLnnqC_mqNvxq`@', 1e5);
+  eq(pts.length, 3); near(pts[0][0], 38.5, 1e-9); near(pts[0][1], -120.2, 1e-9); near(pts[2][0], 43.252, 1e-9); near(pts[2][1], -126.453, 1e-9);
+});
+
+t('extractCandidates: 📍 line ranks first, hashtags dropped', () => {
+  const c = C.extractCandidates('Best tapas ever!! 🔥🔥\n📍 Bar del Pla, Carrer de Montcada 2, Barcelona\n#barcelona #tapas');
+  eq(c[0], 'Bar del Pla, Carrer de Montcada 2, Barcelona');
+  if (c.some(x => x.includes('#'))) throw new Error('hashtag leaked');
+});
+t('extractCandidates: plain lines still offered', () => {
+  const c = C.extractCandidates('Cal Pep');
+  eq(c[0], 'Cal Pep');
+});
+
+t('catFromOsm mapping', () => {
+  eq(C.catFromOsm('amenity', 'restaurant'), 'restaurant'); eq(C.catFromOsm('amenity', 'pub'), 'bar');
+  eq(C.catFromOsm('shop', 'bakery'), 'cafe'); eq(C.catFromOsm('shop', 'clothes'), 'shop');
+  eq(C.catFromOsm('tourism', 'museum'), 'museum'); eq(C.catFromOsm('tourism', 'attraction'), 'sight');
+  eq(C.catFromOsm('leisure', 'park'), 'park'); eq(C.catFromOsm('', ''), 'sight');
+});
+
+t('mulberry32 is deterministic and in [0,1)', () => {
+  const a = C.mulberry32(42)(), b = C.mulberry32(42)();
+  eq(a, b); if (!(a >= 0 && a < 1)) throw new Error('out of range');
+});
+t('buildingHeight: height tag, levels, default', () => {
+  near(C.buildingHeight({ height: '20' }, 1), 2.6, 1e-9);
+  near(C.buildingHeight({ 'building:levels': '5' }, 1), (5 * 3.2 + 1) / 10 * 1.3, 1e-9);
+  const d = C.buildingHeight({}, 123); if (!(d >= 1.04 && d <= 2.08)) throw new Error('default out of range ' + d);
+  eq(C.buildingHeight({}, 123), C.buildingHeight({}, 123), 'deterministic per id');
+});
+t('simplify: building, road, water line, station, sand', () => {
+  const project = (lat, lon) => ({ x: lon * 1000, z: -lat * 1000 });
+  const sq = [{ lat: 0, lon: 0 }, { lat: 0, lon: 0.001 }, { lat: 0.001, lon: 0.001 }, { lat: 0.001, lon: 0 }, { lat: 0, lon: 0 }];
+  const els = [
+    { type: 'way', id: 1, tags: { building: 'yes', height: '10' }, geometry: sq },
+    { type: 'way', id: 2, tags: { highway: 'residential' }, geometry: sq.slice(0, 2) },
+    { type: 'way', id: 3, tags: { highway: 'motorway_link', tunnel: 'yes' }, geometry: sq.slice(0, 2) },
+    { type: 'way', id: 4, tags: { waterway: 'river', width: '60' }, geometry: sq.slice(0, 3) },
+    { type: 'node', id: 5, lat: 0, lon: 0, tags: { railway: 'station', station: 'subway', name: 'Liceu' } },
+    { type: 'way', id: 6, tags: { natural: 'beach' }, geometry: sq },
+    { type: 'way', id: 7, tags: { highway: 'construction' }, geometry: sq.slice(0, 2) },
+  ];
+  const s = C.simplify(els, project);
+  eq(s.map(e => e.k).join(','), 'b,r,wl,st,s');
+  eq(s[0].p.length, 4, 'closing point dropped'); near(s[0].h, 1.3, 1e-9);
+  eq(s[1].c, 'residential'); near(s[2].w, 6, 1e-9); eq(s[3].n, 'Liceu'); eq(s[3].t, 'subway');
+});
+t('overpassQuery contains every filter for every bbox', () => {
+  const q = C.overpassQuery([{ S: 1, W: 2, N: 3, E: 4 }, { S: 5, W: 6, N: 7, E: 8 }]);
+  eq((q.match(/\(1,2,3,4\)/g) || []).length, C.OVERPASS_FILTERS.length);
+  eq((q.match(/\(5,6,7,8\)/g) || []).length, C.OVERPASS_FILTERS.length);
+});
+
+
+t('opening hours: weekday ranges, off day, overnight', () => {
+  const oh = C.parseOpeningHours('Mo-Fr 09:00-18:00; Sa 10:00-14:00; Su off');
+  eq(C.isOpenAt(oh, 0, 10 * 60), true); eq(C.isOpenAt(oh, 0, 19 * 60), false); eq(C.isOpenAt(oh, 5, 13 * 60), true); eq(C.isOpenAt(oh, 6, 12 * 60), false);
+  eq(C.nextOpenAt(oh, 0, 8 * 60), 9 * 60); eq(C.nextOpenAt(oh, 0, 19 * 60), null); eq(C.closesAt(oh, 0, 10 * 60), 18 * 60);
+  const bar = C.parseOpeningHours('Fr,Sa 20:00-02:00');
+  eq(C.isOpenAt(bar, 4, 23 * 60), true); eq(C.isOpenAt(bar, 5, 60), true, 'Saturday 01:00 via Friday spill'); eq(C.isOpenAt(bar, 6, 60), true); eq(C.isOpenAt(bar, 0, 60), false);
+  eq(C.parseOpeningHours('24/7').always, true); eq(C.parseOpeningHours('sunrise-sunset'), null); eq(C.parseOpeningHours(''), null);
+  const two = C.parseOpeningHours('Mo-Su 12:00-15:00,19:00-23:30');
+  eq(C.isOpenAt(two, 2, 16 * 60), false); eq(C.nextOpenAt(two, 2, 16 * 60), 19 * 60);
+});
+t('hhmm formatting', () => { eq(C.hhmm(570), '09:30'); eq(C.hhmm(1500), '01:00+1'); });
+t('schedule: walk, wait for opening, stay, closed flag', () => {
+  const steps = [
+    { node: { isHotel: true, name: 'H' }, timeMin: 0 },
+    { node: { name: 'Museum', hours: 'Mo-Su 10:00-18:00' }, timeMin: 15 },
+    { node: { name: 'Bar', hours: 'Mo-Su 19:00-02:00' }, timeMin: 10 },
+  ];
+  const r = C.scheduleSteps(steps, { startMin: 9 * 60, dow: 0, stayOf: n => n.name === 'Museum' ? 120 : 60, hoursOf: n => C.parseOpeningHours(n.hours) });
+  eq(r.items[1].arrive, 10 * 60, 'waits until 10:00'); eq(r.items[1].wait, 45); eq(r.items[1].depart, 12 * 60);
+  eq(r.items[2].closed, true, 'bar closed at 12:10 and opens too late'); eq(r.closedCount, 1); eq(r.endMin, 12 * 60 + 10 + 60);
+});
+t('schedule-aware ordering pushes a late-opening place later', () => {
+  // Lunch place opens at 13:00 and is closest to the hotel; a museum is open all day but farther.
+  const hotel = { id: 'h', name: 'H', lat: 41.3874, lon: 2.1686 };
+  const places = [{ id: 'L', name: 'Lunch', lat: 41.3890, lon: 2.1686, priority: 5, hours: 'Mo-Su 13:00-16:00' }, { id: 'M', name: 'Museum', lat: 41.3960, lon: 2.1686, priority: 5, hours: 'Mo-Su 09:00-20:00' }];
+  const plain = C.computeRoute({ hotel, places });
+  eq(plain.steps.map(s => s.node.name).join('>'), 'H>Lunch>Museum');
+  const timed = C.computeRoute({ hotel, places }, { schedule: { startMin: 10 * 60, dow: 0, stayOf: () => 90, hoursOf: n => C.parseOpeningHours(n.hours) } });
+  eq(timed.steps.map(s => s.node.name).join('>'), 'H>Museum>Lunch');
+});
+t('explainStep', () => {
+  const steps = [{ node: { isHotel: true, name: 'H' } }, { node: { name: 'A', priority: 9 } }, { node: { name: 'B', priority: 5 } }];
+  eq(C.explainStep(steps, 0), 'Start: your hotel');
+  eq(C.explainStep(steps, 1), 'Priority 9: pulled earlier in the day');
+  eq(C.explainStep(steps, 2), 'Nearest next stop after A');
+  eq(C.explainStep(steps, 2, { wait: 20, opensAt: 12 * 60 }), 'Timed after it opens at 12:00');
+});
+
+document.getElementById('summary').textContent = `${pass} passed, ${fail} failed`;
+document.title = (fail ? 'FAIL ' : 'OK ') + document.title;
+</script>
+</body>
+</html>

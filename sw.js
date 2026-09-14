@@ -1,8 +1,8 @@
 /* Route Notebook — service worker
    Caches the app shell plus the Three.js / font CDN files. Map, geocoding and routing
    services (Overpass, Photon, Nominatim, Valhalla) always go to the network. */
-const VER = 'route-notebook-v1';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-512-maskable.png'];
+const VER = 'route-notebook-v2';
+const SHELL = ['./', './index.html', './core.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-512-maskable.png'];
 const CDN_HOSTS = ['cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
 self.addEventListener('install', e => {
