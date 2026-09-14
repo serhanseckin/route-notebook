@@ -1,8 +1,8 @@
 {
-  "name": "Rota Defteri",
-  "short_name": "Rota Defteri",
-  "description": "Barcelona · Milano · Roma için low-poly 3D yürüme rotası planlayıcı",
-  "lang": "tr",
+  "name": "Route Notebook",
+  "short_name": "Route Notebook",
+  "description": "Low-poly 3D walking-route planner for Barcelona, Milan and Rome",
+  "lang": "en",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

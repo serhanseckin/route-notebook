@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Rota Defteri</title>
+<title>Route Notebook</title>
 <meta name="theme-color" content="#f4eee2">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Rota Defteri">
+<meta name="apple-mobile-web-app-title" content="Route Notebook">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
 }
 </script>
 <style>
-  /* ---------- Tasarım dili: kâğıt, mürekkep, vermilyon ---------- */
+  /* ---------- Design language: paper, ink, vermilion ---------- */
   :root{
     --paper:#f4eee2;
     --paper-2:#ece4d1;
@@ -61,7 +61,7 @@
   button{cursor:pointer}
   ::selection{background:var(--accent-soft)}
 
-  /* ---------- İskelet ---------- */
+  /* ---------- Skeleton ---------- */
   .app{
     height:100dvh;
     display:grid;
@@ -101,7 +101,7 @@
     min-height:0;
   }
 
-  /* ---------- 3D sahne ---------- */
+  /* ---------- 3D scene ---------- */
   .scene-wrap{position:relative;min-height:0;background:#e7dfcc;overflow:hidden}
   .scene-wrap canvas{display:block;width:100%;height:100%;touch-action:none}
   .labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -254,7 +254,7 @@
     background:var(--paper-2);
   }
 
-  /* ---------- Form elemanları ---------- */
+  /* ---------- Form controls ---------- */
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:6px;
     border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);
@@ -304,7 +304,7 @@
     font-family:var(--font-display);font-weight:700;font-size:20px;min-width:28px;text-align:center;
   }
 
-  /* ---------- Rota sayfası ---------- */
+  /* ---------- Route page ---------- */
   .summary{
     display:grid;grid-template-columns:repeat(3,1fr);gap:0;
     border:1.5px solid var(--ink);border-radius:var(--radius);
@@ -381,7 +381,7 @@
   .empty b{font-family:var(--font-display);font-size:17px;font-weight:600;display:block;margin-bottom:4px;color:var(--ink)}
   .page-foot{margin-top:26px;padding-top:14px;border-top:1px dashed var(--line);display:flex;justify-content:flex-end}
 
-  /* ---------- Ekle sayfası ---------- */
+  /* ---------- Add page ---------- */
   .preview-card{
     border:1.5px dashed var(--ochre);background:#fbf3e2;border-radius:var(--radius);
     padding:10px 12px;margin-top:10px;font-size:13.5px;
@@ -412,7 +412,7 @@
   .bulk-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
   .bulk-status{font-size:12.5px;color:var(--ink-2)}
 
-  /* ---------- Tablolar ---------- */
+  /* ---------- Tables ---------- */
   table.t{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px}
   table.t th{
     text-align:left;font-weight:600;font-size:11.5px;color:var(--ink-2);
@@ -427,7 +427,7 @@
     border:1px solid var(--teal);border-radius:999px;padding:0 7px;line-height:17px;vertical-align:2px;margin-left:6px;
   }
 
-  /* ---------- Modal / onay / toast ---------- */
+  /* ---------- Modal / confirm / toast ---------- */
   .veil{
     position:fixed;inset:0;background:rgba(42,39,35,.42);
     display:none;align-items:flex-end;justify-content:center;z-index:50;padding:12px;
@@ -453,7 +453,7 @@
   }
   .toast.is-on{opacity:1;transform:translate(-50%,0)}
 
-  /* ---------- Mobil ---------- */
+  /* ---------- Mobile ---------- */
   @media (max-width:860px){
     body{font-size:14.5px}
     .topbar{padding:10px 12px 0;flex-wrap:wrap;gap:4px}
@@ -481,7 +481,7 @@
 <body>
 <div class="app">
   <header class="topbar">
-    <div class="brand">Rota Defteri <small>Barcelona · Milano · Roma</small></div>
+    <div class="brand">Route Notebook <small>Barcelona · Milan · Rome</small></div>
     <nav class="city-tabs" id="city-tabs"></nav>
   </header>
 
@@ -490,96 +490,96 @@
       <canvas id="scene"></canvas>
       <div class="labels" id="labels"></div>
       <div class="scene-ui">
-        <div class="scene-hint">Zemine <b>dokun</b> → yer ekle · sürükle → döndür · kaydır → yakınlaş</div>
+        <div class="scene-hint"><b>Tap</b> the ground → add a place · drag → rotate · scroll/pinch → zoom</div>
         <div class="scene-status" id="scene-status"></div>
         <div class="scene-tools">
-          <button class="btn btn-sm btn-ghost" id="loc-btn" title="Konumumu haritada göster">Konum</button>
-          <button class="btn btn-sm btn-ghost" id="map-btn" title="Harita verisini yeniden yükle">Harita ↻</button>
-          <button class="btn btn-sm" id="fit-btn" title="Tüm yerleri görüntüye sığdır">Sığdır</button>
+          <button class="btn btn-sm btn-ghost" id="loc-btn" title="Show my location on the map">Locate</button>
+          <button class="btn btn-sm btn-ghost" id="map-btn" title="Reload map data">Map ↻</button>
+          <button class="btn btn-sm" id="fit-btn" title="Fit all places in view">Fit</button>
         </div>
         <div class="map-status" id="map-status"></div>
         <div class="nav-strip" id="nav-strip"></div>
-        <div class="attrib">Harita verisi © OpenStreetMap katkıda bulunanlar</div>
+        <div class="attrib">Map data © OpenStreetMap contributors</div>
         <div class="scene-legend">
-          <span><i style="background:var(--teal)"></i>Otel</span>
-          <span><i style="background:var(--ochre)"></i>Yer</span>
-          <span><i style="background:var(--accent)"></i>Yürüme rotası</span>
+          <span><i style="background:var(--teal)"></i>Hotel</span>
+          <span><i style="background:var(--ochre)"></i>Place</span>
+          <span><i style="background:var(--accent)"></i>Walking route</span>
         </div>
       </div>
     </section>
 
     <aside class="panel">
       <nav class="panel-tabs" id="panel-tabs">
-        <button class="panel-tab is-active" data-page="route">Rota <span class="cnt" id="cnt-places">0</span></button>
-        <button class="panel-tab" data-page="add">Ekle</button>
-        <button class="panel-tab" data-page="transit">Ulaşım</button>
-        <button class="panel-tab" data-page="tickets">Biletler</button>
+        <button class="panel-tab is-active" data-page="route">Route <span class="cnt" id="cnt-places">0</span></button>
+        <button class="panel-tab" data-page="add">Add</button>
+        <button class="panel-tab" data-page="transit">Transit</button>
+        <button class="panel-tab" data-page="tickets">Tickets</button>
       </nav>
       <div class="panel-body" id="panel-body">
 
         <!-- ROTA -->
         <div class="page is-active" data-page="route">
-          <h2 class="sec" id="route-title">Yürüme rotası</h2>
-          <p class="lead">Otelden başlar, puanı yüksek yerleri öne alır. Her değişiklikte kendiliğinden yeniden hesaplanır.</p>
+          <h2 class="sec" id="route-title">Walking route</h2>
+          <p class="lead">Starts at the hotel and favours high-priority places. Recalculates itself on every change.</p>
           <div class="summary" id="route-summary"></div>
           <div id="hotel-card"></div>
           <ol class="steps" id="steps"></ol>
           <div id="route-empty"></div>
           <div class="page-foot">
-            <button class="btn btn-danger btn-sm" id="clear-city">Bu şehrin verisini temizle</button>
+            <button class="btn btn-danger btn-sm" id="clear-city">Clear this city's data</button>
           </div>
         </div>
 
         <!-- EKLE -->
         <div class="page" data-page="add">
-          <h2 class="sec">Yer ekle</h2>
-          <p class="lead">Adres yazıp ara, ya da 3D sahnede zemine dokun. Toplu liste için aşağıdaki tabloyu kullan.</p>
+          <h2 class="sec">Add a place</h2>
+          <p class="lead">Search by address or name, or tap the ground in the 3D scene. Use the table below for a bulk list.</p>
 
           <div class="field">
-            <label for="q">Adres veya mekân adı</label>
+            <label for="q">Address or place name</label>
             <div class="input-row">
-              <input class="input" id="q" placeholder="örn. Bar Cañete, Carrer de la Unió 17" autocomplete="off">
-              <button class="btn" id="q-btn">Bul</button>
+              <input class="input" id="q" placeholder="e.g. Bar Cañete, Carrer de la Unió 17" autocomplete="off">
+              <button class="btn" id="q-btn">Find</button>
             </div>
           </div>
           <div id="preview"></div>
 
-          <div class="or">ya da</div>
+          <div class="or">or</div>
           <div class="field">
-            <label for="paste">Metinden bul <span style="color:var(--muted);font-weight:400">Instagram açıklaması, mesaj, not…</span></label>
-            <textarea class="input" id="paste" rows="3" placeholder="Açıklama metnini buraya yapıştır; 📍 satırı, sokak adı ya da mekân adı aranır"></textarea>
-            <div class="input-row" style="justify-content:flex-end"><button class="btn" id="paste-btn">Metinden bul</button></div>
+            <label for="paste">Find from text <span style="color:var(--muted);font-weight:400">Instagram caption, message, note…</span></label>
+            <textarea class="input" id="paste" rows="3" placeholder="Paste the caption here; the 📍 line, a street name or a place name will be looked up"></textarea>
+            <div class="input-row" style="justify-content:flex-end"><button class="btn" id="paste-btn">Find from text</button></div>
           </div>
-          <div class="or">ya da</div>
-          <p style="margin:0;font-size:13.5px;color:var(--ink-2)">Sahnede zemine dokun: yaklaşık konum seçilir, sonra ad / tür / puan sorulur.</p>
+          <div class="or">or</div>
+          <p style="margin:0;font-size:13.5px;color:var(--ink-2)">Tap the ground in the scene: an approximate spot is picked, then you fill in name / type / priority.</p>
 
-          <h3 class="sub">Toplu ekleme <span>her satır sırayla aranır</span></h3>
+          <h3 class="sub">Bulk add <span>rows are looked up one by one</span></h3>
           <div class="bulk">
-            <div class="bulk-head"><div>Yer adı</div><div>Adres</div><div>Puan</div><div></div></div>
+            <div class="bulk-head"><div>Place name</div><div>Address</div><div>Priority</div><div></div></div>
             <div id="bulk-rows"></div>
           </div>
           <div class="bulk-foot">
-            <button class="btn btn-ghost btn-sm" id="bulk-add-row">+ Satır ekle</button>
+            <button class="btn btn-ghost btn-sm" id="bulk-add-row">+ Add row</button>
             <span class="bulk-status" id="bulk-status"></span>
-            <button class="btn btn-primary btn-sm" id="bulk-go">Tümünü ekle</button>
+            <button class="btn btn-primary btn-sm" id="bulk-go">Add all</button>
           </div>
-          <p class="note">Aramalar OpenStreetMap Nominatim ile yapılır; nezaket kuralı gereği istekler ~1 sn aralıkla gönderilir. Bulunamayan satırlar tabloda kalır.</p>
+          <p class="note">Lookups use Photon and OpenStreetMap Nominatim; requests are spaced ~1 s apart to respect their usage policy. Rows that cannot be found stay in the table.</p>
         </div>
 
-        <!-- ULAŞIM -->
+        <!-- TRANSIT -->
         <div class="page" data-page="transit">
-          <h2 class="sec">Toplu taşımayla gidilecek yerler</h2>
-          <p class="lead">Havalimanları ve maç günü stadyum ulaşımı.</p>
+          <h2 class="sec">Places to reach by public transport</h2>
+          <p class="lead">Airports and match-day stadium transport.</p>
           <div id="transit"></div>
-          <p class="note">Fiyat ve süreler 2026 başı itibarıyla derlendi — seyahatten önce güncelini kontrol edin.</p>
+          <p class="note">Prices and durations were compiled in early 2026 — check the latest before you travel.</p>
         </div>
 
-        <!-- BİLETLER -->
+        <!-- TICKETS -->
         <div class="page" data-page="tickets">
-          <h2 class="sec">Şehir içi biletler</h2>
-          <p class="lead">Metro, otobüs ve tramvay için genel bilet tipleri.</p>
+          <h2 class="sec">City transport tickets</h2>
+          <p class="lead">General ticket types for metro, bus and tram.</p>
           <div id="tickets"></div>
-          <p class="note">Fiyatlar 2026 başı itibarıyla derlendi — seyahatten önce güncelini kontrol edin.</p>
+          <p class="note">Prices were compiled in early 2026 — check the latest before you travel.</p>
         </div>
 
       </div>
@@ -587,52 +587,52 @@
   </div>
 </div>
 
-<!-- Yer/otel formu -->
+<!-- Place/hotel form -->
 <div class="veil" id="sheet-veil">
   <form class="sheet" id="sheet">
-    <h2 id="sheet-title">Yeni yer</h2>
+    <h2 id="sheet-title">New place</h2>
     <p class="loc" id="sheet-loc"></p>
     <div class="field">
-      <label for="f-name">Ad</label>
-      <input class="input" id="f-name" placeholder="örn. Bar Cañete" required autocomplete="off">
+      <label for="f-name">Name</label>
+      <input class="input" id="f-name" placeholder="e.g. Bar Cañete" required autocomplete="off">
     </div>
     <div class="field">
-      <label for="f-note">Kısa not <span style="color:var(--muted);font-weight:400">isteğe bağlı</span></label>
-      <textarea class="input" id="f-note" rows="2" placeholder="örn. tapas için, 20:00 rezervasyon var"></textarea>
+      <label for="f-note">Short note <span style="color:var(--muted);font-weight:400">optional</span></label>
+      <textarea class="input" id="f-note" rows="2" placeholder="e.g. tapas, reservation at 8 pm"></textarea>
     </div>
     <div class="field">
-      <label>Tür</label>
+      <label>Kind</label>
       <div class="seg" id="f-type">
-        <button type="button" data-v="place" class="is-on">Gezilecek yer</button>
-        <button type="button" data-v="hotel">Otel (başlangıç)</button>
+        <button type="button" data-v="place" class="is-on">Place to visit</button>
+        <button type="button" data-v="hotel">Hotel (start)</button>
       </div>
     </div>
     <div class="field" id="f-cat-field">
-      <label>Mekân türü</label>
+      <label>Place type</label>
       <div class="chips" id="f-cat"></div>
     </div>
     <div class="field" id="f-prio-field">
-      <label for="f-prio">Ne kadar gitmek istiyorum? <span style="color:var(--muted);font-weight:400">1 = olsa da olur · 10 = kesinlikle</span></label>
+      <label for="f-prio">How much do I want to go? <span style="color:var(--muted);font-weight:400">1 = nice to have · 10 = must</span></label>
       <div class="range">
         <input type="range" id="f-prio" min="1" max="10" step="1" value="5">
         <output id="f-prio-out">5</output>
       </div>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="btn btn-ghost" id="sheet-cancel">Vazgeç</button>
-      <button type="submit" class="btn btn-primary">Kaydet</button>
+      <button type="button" class="btn btn-ghost" id="sheet-cancel">Cancel</button>
+      <button type="submit" class="btn btn-primary">Save</button>
     </div>
   </form>
 </div>
 
-<!-- Onay -->
+<!-- Confirm -->
 <div class="veil" id="confirm-veil">
   <div class="sheet confirm">
-    <h2 id="confirm-title">Emin misin?</h2>
+    <h2 id="confirm-title">Are you sure?</h2>
     <p id="confirm-text"></p>
     <div class="sheet-actions">
-      <button type="button" class="btn btn-ghost" id="confirm-no">Vazgeç</button>
-      <button type="button" class="btn btn-primary" id="confirm-yes">Evet</button>
+      <button type="button" class="btn btn-ghost" id="confirm-no">Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirm-yes">Yes</button>
     </div>
   </div>
 </div>
@@ -644,9 +644,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 /* =====================================================================
-   Gömülü referans veri
-   NOT: Fiyat ve süre bilgileri 2026 başı itibarıyla derlendi.
-        Seyahatten önce güncelini kontrol edin.
+   Embedded reference data
+   NOTE: Prices and durations were compiled in early 2026.
+         Check the latest before you travel.
    ===================================================================== */
 const CITIES = {
   barcelona: {
@@ -655,87 +655,87 @@ const CITIES = {
     viewbox: [1.75, 41.65, 2.60, 41.15],
     seed: 11,
     tickets: [
-      ['Tekli bilet', '2,90 €', 'Tek yolculuk (metro/otobüs/tramvay)'],
-      ['T-Casual (10 yolculuk)', "13,00 €'dan itibaren", '1 kişilik, bölge sayısına göre artar'],
-      ['Hola BCN (2–5 gün sınırsız)', '18,70 € – 43,60 €', 'Havalimanı metro dönüşü dahil'],
+      ['Single ticket', '€2.90', 'One journey (metro/bus/tram)'],
+      ['T-Casual (10 journeys)', 'from €13.00', 'Single person; price rises with the number of zones'],
+      ['Hola BCN (2–5 days unlimited)', '€18.70 – €43.60', 'Includes the airport metro trip'],
     ],
     transit: [
-      { title: 'El Prat Havalimanı (BCN) → merkez', kind: 'Havalimanı', time: true, rows: [
-        ['Rodalies R2 Nord treni', '4,95 €', '20–25 dk', "Sadece T2'den kalkar — en hızlı/ucuz"],
-        ['Metro L9 Sud', '5,90 €', '30–40 dk', 'Özel bilet gerekir, T-Casual geçmez'],
-        ['Aerobús', '7,75 €', '~35 dk', "Doğrudan Plaça de Catalunya'ya"],
-        ['Taksi', '30–45 €', '20–30 dk', '—'],
+      { title: 'El Prat Airport (BCN) → centre', kind: 'Airport', time: true, rows: [
+        ['Rodalies R2 Nord train', '€4.95', '20–25 min', 'Departs from T2 only — fastest and cheapest'],
+        ['Metro L9 Sud', '€5.90', '30–40 min', 'Needs a special ticket; T-Casual not valid'],
+        ['Aerobús', '€7.75', '~35 min', 'Direct to Plaça de Catalunya'],
+        ['Taxi', '€30–45', '20–30 min', '—'],
       ]},
-      { title: 'Camp Nou (maç günü)', kind: 'Stadyum', time: false, rows: [
-        ['Metro L3 → Palau Reial / Les Corts', '2,90 €', 'Ana girişe (Arístides Maillol) en yakın'],
-        ['Metro L5 → Collblanc / Badal', '2,90 €', 'Stadyumun diğer tarafı için'],
-        ['Tramvay T1/T2/T3 → Palau Reial / Maria Cristina', '2,90 €', 'Maç sonrası çok kalabalık olur'],
+      { title: 'Camp Nou (match day)', kind: 'Stadium', time: false, rows: [
+        ['Metro L3 → Palau Reial / Les Corts', '€2.90', 'Closest to the main entrance (Arístides Maillol)'],
+        ['Metro L5 → Collblanc / Badal', '€2.90', 'For the other side of the stadium'],
+        ['Tram T1/T2/T3 → Palau Reial / Maria Cristina', '€2.90', 'Very crowded after the match'],
       ]},
     ],
   },
   milano: {
-    name: 'Milano', aliases: ['milano', 'milan'],
+    name: 'Milan', aliases: ['milano', 'milan'],
     center: { lat: 45.4642, lon: 9.1900 },
     viewbox: [8.70, 45.75, 9.65, 45.20],
     seed: 23,
     tickets: [
-      ['Tekli bilet', '2,20 €', '90 dk geçerli, sınırsız aktarma'],
-      ['Günlük bilet', '7,60 €', '24 saat'],
-      ['3 günlük bilet', '15,50 €', '—'],
-      ["10'luk karnet", '19,50 €', '—'],
+      ['Single ticket', '€2.20', 'Valid 90 min, unlimited transfers'],
+      ['Day ticket', '€7.60', '24 hours'],
+      ['3-day ticket', '€15.50', '—'],
+      ['10-journey carnet', '€19.50', '—'],
     ],
     transit: [
-      { title: 'Linate Havalimanı (LIN) → merkez', kind: 'Havalimanı', time: true, rows: [
-        ['M4 metro', '2,20 €', '~12 dk', 'Merkeze en hızlı, şehir içi bilet geçerli'],
-        ["73 no'lu otobüs", '2,20 €', '20–30 dk', "San Babila'ya"],
-        ['Özel transfer', '35–55 €', '15–30 dk', '—'],
+      { title: 'Linate Airport (LIN) → centre', kind: 'Airport', time: true, rows: [
+        ['M4 metro', '€2.20', '~12 min', 'Fastest to the centre; city ticket valid'],
+        ['Bus 73', '€2.20', '20–30 min', 'To San Babila'],
+        ['Private transfer', '€35–55', '15–30 min', '—'],
       ]},
-      { title: 'Malpensa Havalimanı (MXP) → merkez', kind: 'Havalimanı', time: true, rows: [
-        ['Malpensa Express → Cadorna', '~13–15 €', '37–40 dk', 'En hızlı tren bağlantısı'],
-        ['Malpensa Express → Centrale', '~13–15 €', '~51 dk', '—'],
-        ['Otobüs (Autostradale/Terravision/Flibco/FlixBus)', '4–13 €', '50–70 dk', "Milano Centrale'ye"],
+      { title: 'Malpensa Airport (MXP) → centre', kind: 'Airport', time: true, rows: [
+        ['Malpensa Express → Cadorna', '~€13–15', '37–40 min', 'Fastest rail link'],
+        ['Malpensa Express → Centrale', '~€13–15', '~51 min', '—'],
+        ['Bus (Autostradale/Terravision/Flibco/FlixBus)', '€4–13', '50–70 min', 'To Milano Centrale'],
       ]},
-      { title: 'San Siro / Stadio Meazza (maç günü)', kind: 'Stadyum', time: false, rows: [
-        ['Metro M5 → San Siro Stadio', '2,20 €', 'Stadyuma bitişik durak, Turuncu/Mavi/Kırmızı sektörler için önerilir'],
-        ['Metro M1 → Lotto', '2,20 €', 'Stadyuma ~15 dk yürüyüş, yoğunlukta alternatif'],
-        ['Tramvay 16 → Stadio Meazza', '2,20 €', 'Merkezden, yavaş ama direkt'],
+      { title: 'San Siro / Stadio Meazza (match day)', kind: 'Stadium', time: false, rows: [
+        ['Metro M5 → San Siro Stadio', '€2.20', 'Stop right next to the stadium; best for the Orange/Blue/Red sectors'],
+        ['Metro M1 → Lotto', '€2.20', '~15 min walk to the stadium; alternative when crowded'],
+        ['Tram 16 → Stadio Meazza', '€2.20', 'From the centre; slow but direct'],
       ]},
     ],
   },
   roma: {
-    name: 'Roma', aliases: ['roma', 'rome'],
+    name: 'Rome', aliases: ['roma', 'rome'],
     center: { lat: 41.9028, lon: 12.4964 },
     viewbox: [12.10, 42.15, 12.90, 41.65],
     seed: 37,
     tickets: [
-      ['BIT bileti', '1,50 €', '100 dk, 1 metro binişi + sınırsız otobüs/tramvay'],
-      ['ROMA 24h', '8,50 €', '—'],
-      ['ROMA 48h', '15,00 €', '—'],
-      ['ROMA 72h', '22,00 €', '—'],
+      ['BIT ticket', '€1.50', '100 min, 1 metro ride + unlimited bus/tram'],
+      ['ROMA 24h', '€8.50', '—'],
+      ['ROMA 48h', '€15.00', '—'],
+      ['ROMA 72h', '€22.00', '—'],
     ],
     transit: [
-      { title: 'Fiumicino Havalimanı (FCO) → merkez', kind: 'Havalimanı', time: true, rows: [
-        ['Leonardo Express treni', '14,00 €', '32 dk', "Direkt Termini'ye — BIT/ATAC bileti geçmez"],
+      { title: 'Fiumicino Airport (FCO) → centre', kind: 'Airport', time: true, rows: [
+        ['Leonardo Express train', '€14.00', '32 min', 'Direct to Termini — BIT/ATAC tickets not valid'],
       ]},
-      { title: 'Ciampino Havalimanı (CIA) → merkez', kind: 'Havalimanı', time: true, rows: [
-        ['520/720 otobüs + metro', '1,50 € (BIT)', 'değişken', 'Cinecittà veya Laurentina metrosuna bağlanır'],
-        ['Cotral / Terravision otobüsü', 'ayrı ücretli', 'değişken', 'Doğrudan, ATAC bileti geçmez'],
+      { title: 'Ciampino Airport (CIA) → centre', kind: 'Airport', time: true, rows: [
+        ['Bus 520/720 + metro', '€1.50 (BIT)', 'varies', 'Connects to Cinecittà or Laurentina metro'],
+        ['Cotral / Terravision bus', 'separate fare', 'varies', 'Direct; ATAC tickets not valid'],
       ]},
     ],
   },
 };
 const CITY_KEYS = Object.keys(CITIES);
 
-/* Mekân türleri: simge, renk ve 3D pin başı */
+/* Place types: icon, colour and 3D pin head */
 const CATS = {
-  restaurant: { label: 'Restoran', emoji: '🍽️', color: 0xe0702f, head: 'octa' },
-  cafe:       { label: 'Kafe',     emoji: '☕',  color: 0x9a6a3c, head: 'cup' },
+  restaurant: { label: 'Restaurant', emoji: '🍽️', color: 0xe0702f, head: 'octa' },
+  cafe:       { label: 'Café',     emoji: '☕',  color: 0x9a6a3c, head: 'cup' },
   bar:        { label: 'Bar',      emoji: '🍸', color: 0x7d4c9e, head: 'ico' },
-  museum:     { label: 'Müze',     emoji: '🏛️', color: 0x3f6fb5, head: 'box' },
-  sight:      { label: 'Gezilecek yer', emoji: '📍', color: 0xd6a52f, head: 'spire' },
-  shop:       { label: 'Dükkân',   emoji: '🛍️', color: 0xd2588c, head: 'pyr' },
+  museum:     { label: 'Museum',   emoji: '🏛️', color: 0x3f6fb5, head: 'box' },
+  sight:      { label: 'Sight', emoji: '📍', color: 0xd6a52f, head: 'spire' },
+  shop:       { label: 'Shop',     emoji: '🛍️', color: 0xd2588c, head: 'pyr' },
   park:       { label: 'Park',     emoji: '🌳', color: 0x5e9c5a, head: 'tree' },
-  other:      { label: 'Diğer',    emoji: '⭐', color: 0x6f6f6f, head: 'dodeca' },
+  other:      { label: 'Other',    emoji: '⭐', color: 0x6f6f6f, head: 'dodeca' },
 };
 const catOf = p => CATS[p?.cat] ? p.cat : 'sight';
 function catFromOsm(key, value) {
@@ -757,7 +757,7 @@ function catFromOsm(key, value) {
 const TRANSIT_WARN_M = 1800;
 
 /* =====================================================================
-   Durum ve kalıcılık
+   State and persistence
    ===================================================================== */
 const STORAGE_KEY = 'rotaDefteri.v1';
 function emptyCity() { return { hotel: null, places: [] }; }
@@ -778,14 +778,14 @@ const state = load() || {
 };
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-  catch { toast('Kaydedilemedi: tarayıcı depolaması kapalı olabilir.'); }
+  catch { toast('Could not save: browser storage may be disabled.'); }
 }
 const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
 const city = () => state.cities[state.active];
 const cityDef = () => CITIES[state.active];
 
 /* =====================================================================
-   Algoritma (spesifikasyondaki gibi)
+   Algorithm (as specified)
    ===================================================================== */
 function haversine(a, b) {
   const R = 6371000, toR = d => d * Math.PI / 180;
@@ -794,8 +794,8 @@ function haversine(a, b) {
   return 2 * R * Math.asin(Math.sqrt(s));
 }
 function walkEstimate(distM) {
-  const routedDist = distM * 1.3;   // yol payı katsayısı
-  const timeMin = routedDist / 80;  // ~4.8 km/s yürüme hızı
+  const routedDist = distM * 1.3;   // detour factor
+  const timeMin = routedDist / 80;  // ~4.8 km/h walking speed
   return { distM: routedDist, timeMin };
 }
 function priorityFactor(score = 5) { return 0.5 + score / 10; }
@@ -811,7 +811,7 @@ function computeRoute(c) {
   const cost = nodes.map((a, i) => nodes.map((b, j) => (i === j ? 0 : routingCost(a, b))));
   const total = o => { let s = 0; for (let i = 0; i < o.length - 1; i++) s += cost[o[i]][o[i + 1]]; return s; };
 
-  // 1) En yakın komşu (başlangıç: otel ya da ilk eklenen yer)
+  // 1) Nearest neighbour (start: hotel, or the first added place)
   const visited = new Array(n).fill(false);
   let order = [0]; visited[0] = true;
   for (let k = 1; k < n; k++) {
@@ -821,7 +821,7 @@ function computeRoute(c) {
     order.push(best); visited[best] = true;
   }
 
-  // 2) 2-opt (açık rota, başlangıç sabit). Maliyet asimetrik olduğu için toplam yeniden hesaplanır.
+  // 2) 2-opt (open route, fixed start). Cost is asymmetric, so the total is recomputed per candidate.
   let best = total(order), improved = true, guard = 0;
   while (improved && guard++ < 200) {
     improved = false;
@@ -835,7 +835,7 @@ function computeRoute(c) {
   }
   return finish(nodes, order);
 
-  // 3) Gösterilen mesafe/süre: ağırlıksız gerçek yürüme tahmini
+  // 3) Displayed distance/time: unweighted real walking estimate
   function finish(nodes, order) {
     const seq = order.map(i => nodes[i]);
     const steps = seq.map((node, k) => {
@@ -852,15 +852,15 @@ function computeRoute(c) {
 }
 
 /* =====================================================================
-   Yardımcılar
+   Helpers
    ===================================================================== */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
-const fmtDist = m => m >= 1000 ? (m / 1000).toFixed(1).replace('.', ',') + ' km' : Math.round(m / 10) * 10 + ' m';
+const fmtDist = m => m >= 1000 ? (m / 1000).toFixed(1) + ' km' : Math.round(m / 10) * 10 + ' m';
 const fmtTime = min => {
   const r = Math.round(min);
-  if (r < 60) return r + ' dk';
-  return Math.floor(r / 60) + ' sa ' + (r % 60 ? (r % 60) + ' dk' : '');
+  if (r < 60) return r + ' min';
+  return Math.floor(r / 60) + ' h ' + (r % 60 ? (r % 60) + ' min' : '');
 };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function mulberry32(a) {
@@ -876,7 +876,7 @@ function toast(msg, ms = 2600) {
   const el = $('#toast'); el.textContent = msg; el.classList.add('is-on');
   clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('is-on'), ms);
 }
-function confirmDialog(title, text, yes = 'Evet') {
+function confirmDialog(title, text, yes = 'Yes') {
   return new Promise(resolve => {
     $('#confirm-title').textContent = title;
     $('#confirm-text').textContent = text;
@@ -890,7 +890,7 @@ function confirmDialog(title, text, yes = 'Evet') {
 }
 
 /* =====================================================================
-   Projeksiyon: şehir merkezi orijin, 1 birim = 10 m
+   Projection: city centre is the origin, 1 unit = 10 m
    ===================================================================== */
 const SCALE = 0.1;
 function project(lat, lon) {
@@ -908,7 +908,7 @@ function unproject(x, z) {
 }
 
 /* =====================================================================
-   Three.js sahnesi
+   Three.js scene
    ===================================================================== */
 const COLORS = {
   bg: 0xe7dfcc, ground: 0xdfd3b6, road: 0xfbf7ee, water: 0x9cc2c8, green: 0xaec585,
@@ -966,14 +966,14 @@ function makeTerrain(seed, flatR) {
   const sum = (ws, x, z) => ws.reduce((h, w) => h + Math.sin(x * w.fx + w.px) * Math.sin(z * w.fz + w.pz) * w.amp, 0);
   return (x, z) => {
     const d = Math.hypot(x, z);
-    if (d < flatR) return 0; // harita alanı dümdüz
+    if (d < flatR) return 0; // map area is perfectly flat
     const rim = Math.min(1.6, (d - flatR) / 420);
     const f = sum(fine, x, z), c = sum(coarse, x, z);
     return rim * rim * (20 + 12 * c + 1.5 * f);
   };
 }
 
-// Zemin: düz kâğıt rengi ova, uzakta low-poly tepeler
+// Ground: flat paper-coloured plain, low-poly hills in the distance
 function buildEnvironment() {
   if (env) { scene.remove(env); env.traverse(o => { o.geometry?.dispose(); o.material?.dispose?.(); }); }
   env = new THREE.Group();
@@ -996,17 +996,17 @@ function buildEnvironment() {
 }
 
 /* ---------------------------------------------------------------------
-   Gerçek harita: OpenStreetMap verisi (Overpass API) → low-poly geometri
-   Şehir merkezine göre 800 m'lik hücreler halinde yüklenir, IndexedDB'de saklanır.
+   Real map: OpenStreetMap data (Overpass API) → low-poly geometry
+   Loaded in 800 m cells relative to the city centre, cached in IndexedDB.
    --------------------------------------------------------------------- */
-const CELL = 80;           // 1 hücre = 80 birim = 800 m
-const CELL_REACH = 70;     // her yerin çevresinde ±700 m yüklenir
-const CENTER_REACH = 95;   // şehir merkezi çevresinde ±950 m
+const CELL = 80;           // 1 cell = 80 units = 800 m
+const CELL_REACH = 70;     // ±700 m loaded around every place
+const CENTER_REACH = 95;   // ±950 m around the city centre
 const MAX_CELLS = 40;
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
 let overpassCursor = 0;
 const CACHE_VER = 'v2';
-const ROAD = { // sınıf → [genişlik(birim), yükseklik]
+const ROAD = { // class → [width (units), height]
   motorway: [2.4, 0.20], trunk: [2.2, 0.20], primary: [1.9, 0.18], secondary: [1.6, 0.16], tertiary: [1.3, 0.14],
   residential: [1.0, 0.12], unclassified: [1.0, 0.12], living_street: [0.9, 0.12], pedestrian: [1.1, 0.12],
   service: [0.55, 0.10], footway: [0.35, 0.08], path: [0.3, 0.08], cycleway: [0.4, 0.08], steps: [0.35, 0.08], track: [0.4, 0.08],
@@ -1090,12 +1090,12 @@ async function overpassFetch(q) {
       const t0 = performance.now();
       const res = await fetch(ep, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, signal: ctl.signal });
       console.info('[harita]', new URL(ep).host, res.status, Math.round(performance.now() - t0) + 'ms');
-      if (res.status === 429 || res.status === 504 || res.status === 503 || res.status === 502) { lastErr = new Error('Sunucu meşgul (' + res.status + ')'); continue; }
+      if (res.status === 429 || res.status === 504 || res.status === 503 || res.status === 502) { lastErr = new Error('Server busy (' + res.status + ')'); continue; }
       if (!res.ok) throw new Error('Overpass ' + res.status);
       const j = await res.json();
-      overpassCursor = (overpassCursor + attempt) % OVERPASS.length; // çalışan sunucuda kal
+      overpassCursor = (overpassCursor + attempt) % OVERPASS.length; // stay on the server that worked
       return j.elements || [];
-    } catch (e) { lastErr = e.name === 'AbortError' ? new Error('zaman aşımı') : e; }
+    } catch (e) { lastErr = e.name === 'AbortError' ? new Error('timeout') : e; }
     finally { clearTimeout(timer); }
   }
   throw lastErr;
@@ -1109,7 +1109,7 @@ async function ensureMap(force = false) {
   const cells = mapCells[cityKey];
   try {
     const need = neededCells();
-    // 1) önbellekten
+    // 1) from cache
     const missing = [];
     for (const c of need) {
       const key = c.cx + ':' + c.cz;
@@ -1118,7 +1118,7 @@ async function ensureMap(force = false) {
       if (cached) cells.set(key, cached); else if (force || !failedCells.has(cityKey + key)) missing.push(c);
     }
     rebuildMap();
-    // 2) eksikleri Overpass'tan: önce 4'erli gruplar, olmazsa tek tek
+    // 2) missing cells from Overpass: batches of 4 first, then one by one
     let done = 0, failed = 0;
     const loadBatch = async (batch) => {
       const bboxes = batch.map(c => cellBBox(c.cx, c.cz));
@@ -1132,20 +1132,20 @@ async function ensureMap(force = false) {
     for (let i = 0; i < missing.length; i += 4) {
       if (state.active !== cityKey) break;
       const batch = missing.slice(i, i + 4);
-      setMapStatus(`Harita yükleniyor… ${done}/${missing.length} hücre`);
+      setMapStatus(`Loading map… ${done}/${missing.length} cells`);
       try { await loadBatch(batch); done += batch.length; }
       catch (e) {
-        // grup başarısız: hücreleri tek tek dene
+        // batch failed: try the cells one by one
         for (const c of batch) {
           if (state.active !== cityKey) break;
-          setMapStatus(`Harita yükleniyor… ${done}/${missing.length} hücre (sunucu yavaş)`);
+          setMapStatus(`Loading map… ${done}/${missing.length} cells (server is slow)`);
           try { await loadBatch([c]); done++; }
           catch (e2) { failedCells.add(cityKey + c.cx + ':' + c.cz); failed++; }
         }
       }
       if (state.active === cityKey) rebuildMap();
     }
-    if (failed) { setMapStatus(`${failed} harita parçası yüklenemedi (Overpass meşgul) — "Harita ↻" ile tekrar dene`, true); return; }
+    if (failed) { setMapStatus(`${failed} map cells failed to load (Overpass busy) — retry with "Map ↻"`, true); return; }
     setMapStatus('');
   } finally {
     mapLoading = false;
@@ -1153,14 +1153,14 @@ async function ensureMap(force = false) {
   }
 }
 
-// ---- Geometri üretimi: tek seferde 4 mesh (binalar, yollar, su, yeşil) ----
+// ---- Geometry: 4 meshes in one go (buildings, roads, water, green) ----
 const BUILDING_TONES = [0xf6eddb, 0xefe3cb, 0xe6d7b8, 0xdcc9a6, 0xf0dcc4];
 const matBuilding = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.92, side: THREE.DoubleSide });
 const matRoad = new THREE.MeshStandardMaterial({ color: COLORS.road, flatShading: true, roughness: 1, side: THREE.DoubleSide });
 const matWater = new THREE.MeshStandardMaterial({ color: COLORS.water, flatShading: true, roughness: 0.6, side: THREE.DoubleSide });
 const matGreen = new THREE.MeshStandardMaterial({ color: COLORS.green, flatShading: true, roughness: 1, side: THREE.DoubleSide });
 
-function triangulate(pts) { // [[x,z],...] -> üçgen indeks listesi
+function triangulate(pts) { // [[x,z],...] -> triangle index list
   const contour = pts.map(p => new THREE.Vector2(p[0], p[1]));
   try { return THREE.ShapeUtils.triangulateShape(contour, []); } catch { return []; }
 }
@@ -1172,10 +1172,10 @@ function pushBuilding(pos, col, b) {
   const pts = b.p, h = b.h, n = pts.length;
   const tone = new THREE.Color(BUILDING_TONES[b.id % BUILDING_TONES.length]);
   const start = pos.length;
-  // çatı
+  // roof
   const tris = triangulate(pts);
   for (const [a, bb, c] of tris) pos.push(pts[a][0], h, pts[a][1], pts[bb][0], h, pts[bb][1], pts[c][0], h, pts[c][1]);
-  // duvarlar
+  // walls
   for (let i = 0; i < n; i++) {
     const p = pts[i], q = pts[(i + 1) % n];
     pos.push(p[0], 0, p[1], q[0], 0, q[1], q[0], h, q[1]);
@@ -1190,7 +1190,7 @@ function pushRoad(pos, r, wy) {
   for (let i = 0; i < n; i++) {
     const a = P[Math.max(0, i - 1)], b = P[i], c = P[Math.min(n - 1, i + 1)];
     let dx = c[0] - a[0], dz = c[1] - a[1]; const len = Math.hypot(dx, dz) || 1; dx /= len; dz /= len;
-    // ortalama-normal (miter), keskin köşelerde sınırlı
+    // averaged normal (miter), limited at sharp corners
     let nx = -dz, nz = dx, m = 1;
     if (i > 0 && i < n - 1) {
       let ux = b[0] - a[0], uz = b[1] - a[1]; const ul = Math.hypot(ux, uz) || 1; ux /= ul; uz /= ul;
@@ -1233,9 +1233,9 @@ function rebuildMap() {
   mapStats = { buildings: nb, roads: nr };
 }
 
-// ---- Pinler ----
+// ---- Pins ----
 const pinConeGeo = new THREE.ConeGeometry(3.2, 9, 6);
-pinConeGeo.rotateX(Math.PI); // uç aşağı
+pinConeGeo.rotateX(Math.PI); // tip down
 const pinHeadGeo = new THREE.OctahedronGeometry(2.8, 0);
 const pinMat = new THREE.MeshStandardMaterial({ color: COLORS.pin, flatShading: true, roughness: 0.8 });
 const pinHeadMat = new THREE.MeshStandardMaterial({ color: COLORS.pinHead, flatShading: true, roughness: 0.6 });
@@ -1253,9 +1253,9 @@ const extrude = (pts, depth) => {
   const sh = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(x, y)));
   const g = new THREE.ExtrudeGeometry(sh, { depth, bevelEnabled: false }); g.translate(0, 0, -depth / 2); return g;
 };
-// Her tür için o türü anımsatan, primitiflerden kurulu low-poly "baş" (tabanı y=0'da)
+// Per type: a low-poly "head" built from primitives that evokes the type (base at y=0)
 const HEAD_BUILDERS = {
-  cafe(m) { // fincan + kulp + tabak
+  cafe(m) { // cup + handle + saucer
     const g = new THREE.Group();
     g.add(M(new THREE.CylinderGeometry(3.0, 2.6, 0.4, 8), accent.cream, 0, 0.2));
     g.add(M(new THREE.CylinderGeometry(2.1, 1.6, 3.2, 8), m, 0, 2.0));
@@ -1263,14 +1263,14 @@ const HEAD_BUILDERS = {
     const h = M(new THREE.TorusGeometry(1.0, 0.32, 5, 8), m, 2.4, 2.0); h.rotation.y = Math.PI / 2; g.add(h);
     return g;
   },
-  restaurant(m) { // tabak + kapak (cloche) + tutamak
+  restaurant(m) { // plate + cloche + knob
     const g = new THREE.Group();
     g.add(M(new THREE.CylinderGeometry(3.3, 2.9, 0.45, 8), accent.cream, 0, 0.22));
     g.add(M(new THREE.SphereGeometry(2.5, 8, 4, 0, Math.PI * 2, 0, Math.PI / 2), m, 0, 0.45));
     g.add(M(new THREE.SphereGeometry(0.45, 5, 4), accent.cream, 0, 3.05));
     return g;
   },
-  bar(m) { // kokteyl bardağı: taban + sap + ters koni + zeytin
+  bar(m) { // cocktail glass: base + stem + inverted cone + olive
     const g = new THREE.Group();
     g.add(M(new THREE.CylinderGeometry(1.6, 1.6, 0.3, 8), accent.cream, 0, 0.15));
     g.add(M(new THREE.CylinderGeometry(0.28, 0.28, 2.2, 6), accent.cream, 0, 1.4));
@@ -1278,7 +1278,7 @@ const HEAD_BUILDERS = {
     g.add(M(new THREE.SphereGeometry(0.5, 5, 4), accent.olive, 0.9, 4.6));
     return g;
   },
-  museum(m) { // basamaklı taban + 4 sütun + çatı + alınlık
+  museum(m) { // stepped base + columns + roof + pediment
     const g = new THREE.Group();
     g.add(M(new THREE.BoxGeometry(5.4, 0.6, 4.0), m, 0, 0.3));
     for (const [x, z] of [[-1.9, -1.1], [-0.65, -1.1], [0.65, -1.1], [1.9, -1.1], [-1.9, 1.1], [1.9, 1.1]])
@@ -1287,27 +1287,27 @@ const HEAD_BUILDERS = {
     g.add(M(extrude([[-2.9, 0], [2.9, 0], [0, 1.7]], 4.3), accent.cream, 0, 3.65));
     return g;
   },
-  sight(m) { // dikilitaş: kaide + kesik piramit gövde + sivri uç
+  sight(m) { // obelisk: plinth + tapered shaft + tip
     const g = new THREE.Group();
     g.add(M(new THREE.BoxGeometry(2.8, 0.5, 2.8), accent.cream, 0, 0.25));
     const body = M(new THREE.CylinderGeometry(0.55, 1.0, 4.4, 4), m, 0, 2.7); body.rotation.y = Math.PI / 4; g.add(body);
     const tip = M(new THREE.ConeGeometry(0.62, 1.1, 4), accent.cream, 0, 5.45); tip.rotation.y = Math.PI / 4; g.add(tip);
     return g;
   },
-  shop(m) { // alışveriş çantası + kulp
+  shop(m) { // shopping bag + handle
     const g = new THREE.Group();
     g.add(M(new THREE.BoxGeometry(3.6, 3.4, 2.0), m, 0, 1.7));
     const h = M(new THREE.TorusGeometry(1.1, 0.24, 5, 8), accent.dark, 0, 3.4); g.add(h);
     return g;
   },
-  park(m) { // ağaç: gövde + iki kat koni
+  park(m) { // tree: trunk + two stacked cones
     const g = new THREE.Group();
     g.add(M(new THREE.CylinderGeometry(0.45, 0.6, 1.8, 6), accent.wood, 0, 0.9));
     g.add(M(new THREE.ConeGeometry(2.6, 3.6, 6), m, 0, 3.0));
     g.add(M(new THREE.ConeGeometry(1.9, 2.8, 6), accent.leaf, 0, 5.2));
     return g;
   },
-  other(m) { // beş köşeli yıldız
+  other(m) { // five-point star
     const pts = [];
     for (let i = 0; i < 10; i++) { const r = i % 2 ? 1.3 : 3.0, a = Math.PI / 2 + i * Math.PI / 5; pts.push([Math.cos(a) * r, Math.sin(a) * r]); }
     const g = new THREE.Group();
@@ -1336,7 +1336,7 @@ function makePlacePin(mats = null, cat = 'sight') {
   const g = new THREE.Group();
   const cone = new THREE.Mesh(pinConeGeo, mats ? mats[0] : pinMat); cone.position.y = 4.5; cone.castShadow = true;
   g.add(cone);
-  if (mats) { // önizleme: sade oktahedron
+  if (mats) { // preview: plain octahedron
     const head = new THREE.Mesh(pinHeadGeo, mats[1]); head.position.y = 11; g.add(head);
     g.userData.top = 14.5;
   } else {
@@ -1388,7 +1388,7 @@ function setPreview(loc) {
   rebuildLabels();
 }
 
-// ---- Rota şeridi ----
+// ---- Route ribbon ----
 let ribbon = null;
 const fades = []; // {obj, from, to, t0, dur, onDone}
 function buildRibbon(steps) {
@@ -1399,14 +1399,14 @@ function buildRibbon(steps) {
     const ll = leg ? leg.shape : [[a.lat, a.lon], [b.lat, b.lon]];
     legs.push({ routed: !!leg, pts: ll.map(([lat, lon]) => { const { x, z } = project(lat, lon); return new THREE.Vector3(x, 0, z); }) });
   }
-  const hex = (cx, cz, y, r) => { // eklem yaması: düz altıgen
+  const hex = (cx, cz, y, r) => { // joint patch: flat hexagon
     for (let i = 0; i < 6; i++) {
       const a0 = i / 6 * Math.PI * 2, a1 = (i + 1) / 6 * Math.PI * 2;
       verts.push(cx, y, cz, cx + Math.cos(a0) * r, y, cz + Math.sin(a0) * r, cx + Math.cos(a1) * r, y, cz + Math.sin(a1) * r);
     }
   };
   for (const leg of legs) {
-    // Sokak rotası: yerde, yolların hemen üstünde. Yedek (kuş uçuşu): havada, binaların üstünde.
+    // Street route: on the ground, just above the roads. Fallback (straight line): in the air, above buildings.
     const W = leg.routed ? 2.0 : 3.2, LIFT = leg.routed ? 0.34 : 4.2, JIT = leg.routed ? 0.08 : 0.35, STEP = leg.routed ? 6 : 9;
     const P = leg.pts; let piece = 0;
     for (let s = 0; s < P.length - 1; s++) {
@@ -1435,7 +1435,7 @@ function buildRibbon(steps) {
   mesh.castShadow = true;
   const grp = new THREE.Group(); grp.add(mesh);
 
-  // Durak diskleri
+  // Stop discs
   const discGeo = new THREE.CylinderGeometry(3.0, 3.0, 0.9, 6);
   const discMat = new THREE.MeshStandardMaterial({ color: COLORS.routeNode, flatShading: true, transparent: true, opacity: 0 });
   for (const st of steps) {
@@ -1458,7 +1458,7 @@ function updateRibbon(route) {
   fadeGroup(ribbon, 1);
 }
 
-// ---- Etiketler (DOM, sahneye projekte) ----
+// ---- Labels (DOM, projected onto the scene) ----
 const labelsEl = $('#labels');
 let labelEntries = [];
 let currentRoute = null;
@@ -1475,12 +1475,12 @@ function rebuildLabels() {
     let k = 0;
     currentRoute.steps.forEach((s, i) => {
       const obj = pinObjects.get(s.node.id); if (!obj) return;
-      if (s.node.isHotel) add(obj, 'is-hotel', 'Otel', s.node.name, s.node.id);
+      if (s.node.isHotel) add(obj, 'is-hotel', 'Hotel', s.node.name, s.node.id);
       else add(obj, '', ++k, CATS[catOf(s.node)].emoji + ' ' + s.node.name, s.node.id);
     });
   }
-  if (previewPin) add(previewPin, 'is-preview', '?', 'Önizleme');
-  if (typeof meGroup !== 'undefined' && meGroup.visible) add(meGroup, 'is-me', '●', 'Buradasın');
+  if (previewPin) add(previewPin, 'is-preview', '?', 'Preview');
+  if (typeof meGroup !== 'undefined' && meGroup.visible) add(meGroup, 'is-me', '●', 'You are here');
 }
 const _v = new THREE.Vector3();
 function updateLabels() {
@@ -1493,7 +1493,7 @@ function updateLabels() {
   }
 }
 
-// ---- Kamera ----
+// ---- Camera ----
 let camTween = null;
 function flyTo(target, dist) {
   const dir = camera.position.clone().sub(controls.target).normalize();
@@ -1522,7 +1522,7 @@ function fitAll(animated = true) {
   }
 }
 
-// ---- Boyut ----
+// ---- Resize ----
 function resize() {
   const w = wrap.clientWidth, h = wrap.clientHeight;
   if (!w || !h) return;
@@ -1532,7 +1532,7 @@ function resize() {
 new ResizeObserver(resize).observe(wrap);
 resize();
 
-// ---- Tıklama (sürüklemeden ayır) ----
+// ---- Click (distinguish from drag) ----
 const raycaster = new THREE.Raycaster();
 const ndc = new THREE.Vector2();
 let down = null;
@@ -1567,7 +1567,7 @@ function selectPlace(id, fly = false) {
   if (fly && g) flyTo(g.position, 180);
 }
 
-// ---- Döngü ----
+// ---- Loop ----
 let last = performance.now();
 function animate(now) {
   requestAnimationFrame(animate);
@@ -1595,7 +1595,7 @@ function animate(now) {
 requestAnimationFrame(animate);
 
 /* =====================================================================
-   Nominatim (sıralı kuyruk, istekler arası ≥1.1 sn)
+   Geocoding: Photon + Nominatim (sequential queue, ≥1.1 s between requests)
    ===================================================================== */
 const geo = { chain: Promise.resolve(), last: 0 };
 function queued(fn) { const p = geo.chain.then(fn, fn); geo.chain = p.catch(() => {}); return p; }
@@ -1624,14 +1624,14 @@ async function nominatimSearch(q, cityKey) {
   const wait = 1100 - (Date.now() - geo.last);
   if (wait > 0) await sleep(wait);
   const def = CITIES[cityKey];
-  const params = new URLSearchParams({ format: 'jsonv2', limit: '3', 'accept-language': 'tr', viewbox: def.viewbox.join(','), bounded: '1', q: cityQuery(q, def) });
+  const params = new URLSearchParams({ format: 'jsonv2', limit: '3', 'accept-language': 'en', viewbox: def.viewbox.join(','), bounded: '1', q: cityQuery(q, def) });
   geo.last = Date.now();
   const res = await fetch('https://nominatim.openstreetmap.org/search?' + params.toString(), { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error('Nominatim ' + res.status);
   const data = await res.json();
   return data.map(d => ({ lat: +d.lat, lon: +d.lon, name: d.name || '', address: d.display_name, cat: catFromOsm(d.category, d.type), kind: d.type || '' }));
 }
-// Adayları döndürür: önce Photon (isimlerde esnek), boşsa Nominatim (adreslerde güçlü)
+// Returns candidates: Photon first (forgiving with names), then Nominatim (strong with addresses)
 function geocodeMulti(q, cityKey) {
   return queued(async () => {
     let r = [];
@@ -1642,7 +1642,7 @@ function geocodeMulti(q, cityKey) {
 }
 async function geocode(q, cityKey) { const r = await geocodeMulti(q, cityKey); return r[0] || null; }
 
-// Yapıştırılan metinden (örn. Instagram açıklaması) adres/mekân satırlarını ayıkla
+// Extract address/place-like lines from pasted text (e.g. an Instagram caption)
 function extractCandidates(text) {
   const parts = text.split(/\n|•|\||·|\s{2,}|(?<=[.!?])\s+/).map(l => l.trim()).filter(Boolean);
   const cands = [];
@@ -1665,7 +1665,7 @@ function extractCandidates(text) {
 }
 
 /* =====================================================================
-   UI: şehir sekmeleri, panel sayfaları
+   UI: city tabs, panel pages
    ===================================================================== */
 const cityTabsEl = $('#city-tabs');
 CITY_KEYS.forEach(k => {
@@ -1678,7 +1678,7 @@ function switchCity(k) {
   if (state.active !== k) { state.active = k; save(); }
   setPreview(null); selectedId = null;
   document.querySelectorAll('.city-tab').forEach(b => b.classList.toggle('is-active', b.dataset.city === k));
-  $('#route-title').textContent = CITIES[k].name + ' — yürüme rotası';
+  $('#route-title').textContent = CITIES[k].name + ' — walking route';
   buildEnvironment();
   rebuildMap(); setMapStatus('');
   rebuildPins();
@@ -1695,9 +1695,9 @@ function showPage(p) {
 }
 
 /* =====================================================================
-   Sokak bazlı yürüme rotaları: Valhalla (FOSSGIS, ücretsiz, anahtarsız)
-   Sıralama kararı spesifikasyondaki algoritmayla verilir; her adımın
-   sokak şekli, gerçek mesafesi ve süresi buradan gelir.
+   Street-level walking legs: Valhalla (FOSSGIS, free, no key)
+   The ordering is decided by the algorithm above; each leg's street
+   shape, real distance and duration come from here.
    ===================================================================== */
 const VALHALLA = 'https://valhalla1.openstreetmap.de/route';
 const LEG_STORE = 'rotaDefteri.legs.v1';
@@ -1728,14 +1728,14 @@ async function fetchLeg(a, b) {
   try {
     const res = await fetch(VALHALLA, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl.signal,
-      body: JSON.stringify({ locations: [{ lat: a.lat, lon: a.lon }, { lat: b.lat, lon: b.lon }], costing: 'pedestrian', directions_options: { units: 'kilometers', language: 'tr-TR' } }),
+      body: JSON.stringify({ locations: [{ lat: a.lat, lon: a.lon }, { lat: b.lat, lon: b.lon }], costing: 'pedestrian', directions_options: { units: 'kilometers', language: 'en-US' } }),
     });
     if (!res.ok) throw new Error('Valhalla ' + res.status);
     const j = await res.json();
     const L = j.trip.legs[0];
     const shape = decodePolyline(L.shape);
     const man = (L.maneuvers || []).filter(m => m.instruction).map(m => [m.instruction, Math.round((m.length || 0) * 1000)]);
-    // Şekil yola oturtulur; başı ve sonu gerçek noktaya bağlanır
+    // The shape is snapped to roads; connect its ends to the real points
     return { shape: [[a.lat, a.lon], ...shape, [b.lat, b.lon]], distM: L.summary.length * 1000, timeMin: L.summary.time / 60, man };
   } finally { clearTimeout(timer); }
 }
@@ -1751,23 +1751,23 @@ async function fetchMissingLegs(route) {
   if (!need.length) return;
   legFetching = true;
   let done = 0, failed = 0;
-  setStatus(`Sokak rotaları hesaplanıyor… 0/${need.length}`);
+  setStatus(`Computing street routes… 0/${need.length}`);
   for (const [key, a, b] of need) {
     try { legCache.set(key, await fetchLeg(a, b)); }
     catch (e) { legCache.set(key, { fail: true, t: Date.now() }); failed++; }
     done++;
-    setStatus(`Sokak rotaları hesaplanıyor… ${done}/${need.length}`);
+    setStatus(`Computing street routes… ${done}/${need.length}`);
     await sleep(200);
   }
   saveLegs();
   legFetching = false;
   setStatus('');
-  if (failed) toast(`${failed} adım için sokak rotası alınamadı; kuş uçuşu tahmin gösteriliyor.`);
+  if (failed) toast(`Street route unavailable for ${failed} leg(s); showing straight-line estimates.`);
   recompute();
 }
 
 /* =====================================================================
-   Rota sayfası
+   Route page
    ===================================================================== */
 function recompute(animate = true) {
   const c = city();
@@ -1786,44 +1786,44 @@ function renderRoute(route) {
   const stepsEl = $('#steps');
   const emptyEl = $('#route-empty');
 
-  // Otel kartı
+  // Hotel card
   const hc = $('#hotel-card');
   if (c.hotel) {
     hc.innerHTML = `<div class="hotel-card">
       <div class="mark">O</div>
       <div class="body"><div class="name">${esc(c.hotel.name)}</div><div class="addr">${esc(c.hotel.address || fmtLatLon(c.hotel))}</div>${c.hotel.note ? `<div class="note">${esc(c.hotel.note)}</div>` : ''}</div>
-      <button class="icon-btn" data-act="edit-hotel" title="Düzenle">✎</button>
-      <button class="icon-btn" data-act="del-hotel" title="Oteli kaldır">×</button>
+      <button class="icon-btn" data-act="edit-hotel" title="Edit">✎</button>
+      <button class="icon-btn" data-act="del-hotel" title="Remove hotel">×</button>
     </div>`;
   } else {
     hc.innerHTML = `<div class="hotel-card is-empty">
       <div class="mark">O</div>
-      <div class="body">Henüz otel yok. Otel, rotanın sabit başlangıcıdır — sahneye dokunup ya da adres arayıp tür olarak <b>Otel</b> seç.</div>
+      <div class="body">No hotel yet. The hotel is the fixed start of the route — tap the scene or search an address and choose <b>Hotel</b> as the kind.</div>
     </div>`;
   }
 
   if (!route || !c.places.length) {
-    sum.innerHTML = `<div><b>0</b><span>yer</span></div><div><b>—</b><span>toplam mesafe</span></div><div><b>—</b><span>yürüme süresi</span></div>`;
+    sum.innerHTML = `<div><b>0</b><span>places</span></div><div><b>—</b><span>total distance</span></div><div><b>—</b><span>walking time</span></div>`;
     stepsEl.innerHTML = '';
-    emptyEl.innerHTML = `<div class="empty"><b>Defter boş</b>Sahnede zemine dokunarak ya da <button class="btn btn-sm btn-ghost" data-act="go-add" style="vertical-align:middle">Ekle</button> sekmesinden ilk yeri ekle.</div>`;
+    emptyEl.innerHTML = `<div class="empty"><b>The notebook is empty</b>Add the first place by tapping the ground in the scene or from the <button class="btn btn-sm btn-ghost" data-act="go-add" style="vertical-align:middle">Add</button> tab.</div>`;
     return;
   }
   emptyEl.innerHTML = '';
   const approx = route.steps.some((s, i) => i > 0 && !s.leg) ? '~' : '';
-  sum.innerHTML = `<div><b>${c.places.length}</b><span>yer</span></div>
-    <div><b>${approx}${fmtDist(route.totalDist)}</b><span>toplam mesafe</span></div>
-    <div><b>${approx}${fmtTime(route.totalTime)}</b><span>yürüme süresi</span></div>`;
+  sum.innerHTML = `<div><b>${c.places.length}</b><span>${c.places.length === 1 ? 'place' : 'places'}</span></div>
+    <div><b>${approx}${fmtDist(route.totalDist)}</b><span>total distance</span></div>
+    <div><b>${approx}${fmtTime(route.totalTime)}</b><span>walking time</span></div>`;
 
   let k = 0;
   stepsEl.innerHTML = route.steps.map((s, i) => {
     const n = s.node;
-    if (n.isHotel) return ''; // otel yukarıdaki kartta
+    if (n.isHotel) return ''; // the hotel is shown in the card above
     k++;
     const gmaps = `https://www.google.com/maps/dir/?api=1&destination=${n.lat},${n.lon}&travelmode=walking`;
     const dirs = s.leg && s.leg.man.length
-      ? `<details class="dirs"><summary>yol tarifi (${s.leg.man.length} adım)</summary><ol>${s.leg.man.map(([t, m]) => `<li>${esc(t)}${m ? `<small>${fmtDist(m)}</small>` : ''}</li>`).join('')}</ol></details>` : '';
-    const leg = i === 0 ? `<div class="leg"><b>Başlangıç</b> — otel yok, ilk eklenen yerden başlanır</div>`
-      : `<div class="leg">${s.leg ? '' : '~'}${fmtDist(s.distM)} · <b>${fmtTime(s.timeMin)}</b> ${s.leg ? 'sokaktan yürüyüş' : 'kuş uçuşu tahmin'}<a class="gmaps" href="${gmaps}" target="_blank" rel="noopener">Google Maps'te aç</a>${s.warn ? `<span class="warn">uzun adım — toplu taşıma düşünebilirsin <button data-act="go-tickets">biletler</button></span>` : ''}${dirs}</div>`;
+      ? `<details class="dirs"><summary>directions (${s.leg.man.length} steps)</summary><ol>${s.leg.man.map(([t, m]) => `<li>${esc(t)}${m ? `<small>${fmtDist(m)}</small>` : ''}</li>`).join('')}</ol></details>` : '';
+    const leg = i === 0 ? `<div class="leg"><b>Start</b> — no hotel, so the route starts at the first added place</div>`
+      : `<div class="leg">${s.leg ? '' : '~'}${fmtDist(s.distM)} · <b>${fmtTime(s.timeMin)}</b> ${s.leg ? 'walk via streets' : 'straight-line estimate'}<a class="gmaps" href="${gmaps}" target="_blank" rel="noopener">Open in Google Maps</a>${s.warn ? `<span class="warn">long leg — consider public transport <button data-act="go-tickets">tickets</button></span>` : ''}${dirs}</div>`;
     const meter = Array.from({ length: 10 }, (_, j) => `<i class="${j < n.priority ? 'on' : ''}"></i>`).join('');
     return `<li class="step ${i === 0 ? 'is-start' : ''} ${n.id === selectedId ? 'is-selected' : ''}" data-id="${n.id}">
       ${leg}
@@ -1834,12 +1834,12 @@ function renderRoute(route) {
           <div class="step-addr"><span class="cat-tag">${CATS[catOf(n)].label}</span> · ${esc(n.address || fmtLatLon(n))}</div>
           ${n.note ? `<div class="step-note">${esc(n.note)}</div>` : ''}
           <div class="step-ctl">
-            <span class="prio"><button data-act="dec" title="Azalt">−</button><b>${n.priority}</b><button data-act="inc" title="Artır">+</button></span>
+            <span class="prio"><button data-act="dec" title="Lower">−</button><b>${n.priority}</b><button data-act="inc" title="Raise">+</button></span>
             <span class="meter">${meter}</span>
-            <span class="prio-lbl">öncelik</span>
+            <span class="prio-lbl">priority</span>
             <span style="flex:1"></span>
-            <button class="icon-btn" data-act="edit" title="Düzenle">✎</button>
-            <button class="icon-btn" data-act="del" title="Sil">×</button>
+            <button class="icon-btn" data-act="edit" title="Edit">✎</button>
+            <button class="icon-btn" data-act="del" title="Delete">×</button>
           </div>
         </div>
       </div>
@@ -1857,8 +1857,8 @@ $('#panel-body').addEventListener('click', async e => {
   if (act === 'go-tickets') return showPage('tickets');
   if (act === 'edit-hotel') { openSheet(c.hotel, c.hotel.name, { edit: c.hotel, hotel: true }); return; }
   if (act === 'del-hotel') {
-    if (await confirmDialog('Otel kaldırılsın mı?', `${c.hotel.name} başlangıç noktası olmaktan çıkacak.`, 'Kaldır')) {
-      c.hotel = null; save(); rebuildPins(); recompute(); toast('Otel kaldırıldı.');
+    if (await confirmDialog('Remove the hotel?', `${c.hotel.name} will no longer be the starting point.`, 'Remove')) {
+      c.hotel = null; save(); rebuildPins(); recompute(); toast('Hotel removed.');
     }
     return;
   }
@@ -1867,9 +1867,9 @@ $('#panel-body').addEventListener('click', async e => {
     const v = Math.max(1, Math.min(10, p.priority + (act === 'inc' ? 1 : -1)));
     if (v !== p.priority) { p.priority = v; save(); recompute(); }
   } else if (act === 'del') {
-    if (await confirmDialog('Yer silinsin mi?', `${p.name} listeden ve rotadan çıkarılacak.`, 'Sil')) {
+    if (await confirmDialog('Delete this place?', `${p.name} will be removed from the list and the route.`, 'Delete')) {
       c.places = c.places.filter(x => x.id !== id); if (selectedId === id) selectedId = null;
-      save(); rebuildPins(); recompute(); toast('Silindi.');
+      save(); rebuildPins(); recompute(); toast('Deleted.');
     }
   } else if (act === 'focus') {
     selectPlace(id, true);
@@ -1880,18 +1880,18 @@ $('#panel-body').addEventListener('click', async e => {
 
 $('#clear-city').onclick = async () => {
   const c = city();
-  if (!c.hotel && !c.places.length) return toast('Bu şehirde silinecek veri yok.');
-  if (await confirmDialog(`${cityDef().name} verisi silinsin mi?`, `${c.places.length} yer ve otel kaydı kalıcı olarak silinecek.`, 'Hepsini sil')) {
+  if (!c.hotel && !c.places.length) return toast('Nothing to clear in this city.');
+  if (await confirmDialog(`Clear ${cityDef().name}?`, `${c.places.length} place(s) and the hotel will be deleted permanently.`, 'Delete all')) {
     state.cities[state.active] = emptyCity(); save();
     setPreview(null); selectedId = null; rebuildPins(); recompute(); fitAll();
-    toast('Şehir verisi temizlendi.');
+    toast('City data cleared.');
   }
 };
 $('#fit-btn').onclick = () => fitAll();
-$('#map-btn').onclick = () => { failedCells.clear(); ensureMap(true); toast('Harita yeniden yükleniyor…'); };
+$('#map-btn').onclick = () => { failedCells.clear(); ensureMap(true); toast('Reloading map…'); };
 
 /* =====================================================================
-   Yer/otel formu
+   Place/hotel form
    ===================================================================== */
 let pending = null; // {lat, lon, address, name}
 let sheetType = 'place';
@@ -1911,8 +1911,8 @@ function openSheet(loc, presetName = '', opts = {}) {
   setSheetCat(editing ? catOf(editing) : (opts.cat || loc.cat || 'sight'));
   setSheetType(editingHotel ? 'hotel' : 'place');
   $('#f-type').closest('.field').style.display = editing ? 'none' : '';
-  if (editing) $('#sheet-title').textContent = editingHotel ? 'Oteli düzenle' : 'Yeri düzenle';
-  $('#sheet-loc').textContent = loc.address ? loc.address : `Yaklaşık konum · ${fmtLatLon(loc)}`;
+  if (editing) $('#sheet-title').textContent = editingHotel ? 'Edit hotel' : 'Edit place';
+  $('#sheet-loc').textContent = loc.address ? loc.address : `Approximate location · ${fmtLatLon(loc)}`;
   sheetVeil.classList.add('is-open');
   setTimeout(() => $('#f-name').focus(), 50);
 }
@@ -1922,7 +1922,7 @@ function setSheetType(t) {
   $('#f-type').querySelectorAll('button').forEach(b => b.classList.toggle('is-on', b.dataset.v === t));
   $('#f-prio-field').style.display = t === 'hotel' ? 'none' : '';
   $('#f-cat-field').style.display = t === 'hotel' ? 'none' : '';
-  $('#sheet-title').textContent = t === 'hotel' ? 'Otel işaretle' : 'Yeni yer';
+  $('#sheet-title').textContent = t === 'hotel' ? 'Mark hotel' : 'New place';
 }
 $('#f-type').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSheetType(b.dataset.v); });
 $('#f-prio').addEventListener('input', e => $('#f-prio-out').textContent = e.target.value);
@@ -1939,25 +1939,25 @@ $('#sheet').addEventListener('submit', async e => {
   if (editing) {
     editing.name = name; editing.note = note;
     if (!editingHotel) { editing.priority = +$('#f-prio').value || 5; editing.cat = sheetCat; }
-    closeSheet(); save(); rebuildPins(); recompute(); toast('Güncellendi.');
+    closeSheet(); save(); rebuildPins(); recompute(); toast('Updated.');
     return;
   }
   closeSheet();
   if (type === 'hotel') {
-    if (c.hotel && !(await confirmDialog('Otel değiştirilsin mi?', `Mevcut otel "${c.hotel.name}" yerine "${name}" başlangıç noktası olacak.`, 'Değiştir'))) return;
+    if (c.hotel && !(await confirmDialog('Replace the hotel?', `"${name}" will replace "${c.hotel.name}" as the starting point.`, 'Replace'))) return;
     c.hotel = { id: uid(), name, note, lat: loc.lat, lon: loc.lon, address: loc.address || '' };
-    toast('Otel işaretlendi — rota buradan başlar.');
+    toast('Hotel marked — the route starts here.');
   } else {
     const priority = +$('#f-prio').value || 5;
     c.places.push({ id: uid(), name, note, cat: sheetCat, lat: loc.lat, lon: loc.lon, address: loc.address || '', priority });
-    toast(`"${name}" eklendi.`);
+    toast(`"${name}" added.`);
   }
   save(); setPreview(null); rebuildPins(); recompute(); fitAll();
   showPage('route');
 });
 
 /* =====================================================================
-   Canlı konum: haritada "buradasın" işareti, sonraki durak, yol tarifi
+   Live location: "you are here" marker, next stop, directions
    ===================================================================== */
 let geoWatch = null, mePos = null, follow = false, lastMapCheck = 0;
 const meGroup = new THREE.Group();
@@ -1985,12 +1985,12 @@ function stopLocation() {
 }
 function toggleLocation() {
   if (geoWatch !== null) return stopLocation();
-  if (!('geolocation' in navigator)) return toast('Bu tarayıcıda konum desteği yok.');
-  if (!window.isSecureContext) toast('Konum için sayfanın https (ya da ana ekrandan) açılması gerekir.');
-  geoWatch = navigator.geolocation.watchPosition(onPosition, err => { toast('Konum alınamadı: ' + err.message); stopLocation(); },
+  if (!('geolocation' in navigator)) return toast('This browser has no location support.');
+  if (!window.isSecureContext) toast('Location needs the page to be opened over https (or from the home screen).');
+  geoWatch = navigator.geolocation.watchPosition(onPosition, err => { toast('Could not get location: ' + err.message); stopLocation(); },
     { enableHighAccuracy: true, maximumAge: 3000, timeout: 25000 });
   $('#loc-btn').classList.add('is-on');
-  toast('Konum izleniyor — sahneyi sürükleyince takip durur.');
+  toast('Tracking location — dragging the scene stops following.');
 }
 $('#loc-btn').onclick = toggleLocation;
 function updateNav() {
@@ -2001,17 +2001,17 @@ function updateNav() {
   steps.forEach((st, i) => { const d = haversine(mePos, st.node); if (d < nd) { nd = d; ni = i; } });
   const next = (nd < 60 && ni + 1 < steps.length) ? ni + 1 : ni;
   const st = steps[next], w = walkEstimate(haversine(mePos, st.node));
-  const num = st.node.isHotel ? 'Otel' : (next + (currentRoute.startIsHotel ? 0 : 1));
+  const num = st.node.isHotel ? 'Hotel' : (next + (currentRoute.startIsHotel ? 0 : 1));
   const gm = `https://www.google.com/maps/dir/?api=1&destination=${st.node.lat},${st.node.lon}&travelmode=walking`;
-  strip.innerHTML = `<div class="nav-main"><b>${nd < 60 && next !== ni ? 'Sonraki' : 'Hedef'}: ${esc(String(num))} · ${esc(st.node.name)}</b><span>≈ ${fmtDist(w.distM)} · ${fmtTime(w.timeMin)} yürüyüş</span></div>
-    <button class="btn btn-sm btn-ghost ${follow ? 'is-on' : ''}" id="follow-btn" title="Kamera konumu takip etsin">Takip</button>
-    <a class="btn btn-sm btn-primary" href="${gm}" target="_blank" rel="noopener">Yol tarifi</a>`;
+  strip.innerHTML = `<div class="nav-main"><b>${nd < 60 && next !== ni ? 'Next' : 'Heading to'}: ${esc(String(num))} · ${esc(st.node.name)}</b><span>≈ ${fmtDist(w.distM)} · ${fmtTime(w.timeMin)} walk</span></div>
+    <button class="btn btn-sm btn-ghost ${follow ? 'is-on' : ''}" id="follow-btn" title="Keep the camera on my location">Follow</button>
+    <a class="btn btn-sm btn-primary" href="${gm}" target="_blank" rel="noopener">Directions</a>`;
   strip.classList.add('is-on');
   $('#follow-btn').onclick = () => { follow = !follow; $('#follow-btn').classList.toggle('is-on', follow); if (follow) flyTo(meGroup.position, Math.min(220, camera.position.distanceTo(controls.target))); };
 }
 
 /* =====================================================================
-   Ekle sayfası: tekil arama + önizleme
+   Add page: single search + preview
    ===================================================================== */
 const status = $('#scene-status');
 function setStatus(msg) { status.textContent = msg || ''; status.classList.toggle('is-on', !!msg); }
@@ -2019,12 +2019,12 @@ let searchResults = [], searchPick = 0;
 function renderCandidates(results, hint) {
   searchResults = results; searchPick = 0;
   const box = $('#preview');
-  if (!results.length) { box.innerHTML = `<div class="preview-card">Bulunamadı. Mekân adını daha kısa yazmayı, cadde + numara eklemeyi ya da şehir adını eklemeyi dene.</div>`; setPreview(null); return; }
+  if (!results.length) { box.innerHTML = `<div class="preview-card">Not found. Try a shorter place name, add street + number, or add the city name.</div>`; setPreview(null); return; }
   setPreview(results[0]);
   box.innerHTML = `<div class="preview-card">
     ${hint ? `<div class="addr">${esc(hint)}</div>` : ''}
     <div class="cands">${results.map((r, i) => `<button type="button" class="cand ${i === 0 ? 'is-on' : ''}" data-i="${i}"><span class="ico">${CATS[r.cat].emoji}</span><span><b>${esc(r.name || r.address)}</b><small>${esc(CATS[r.cat].label)}${r.kind ? ' · ' + esc(r.kind) : ''} · ${esc(r.address)}</small></span></button>`).join('')}</div>
-    <div class="row"><button class="btn btn-primary btn-sm" id="pv-use">Bu konumu kullan</button><button class="btn btn-ghost btn-sm" id="pv-drop">Vazgeç</button></div>
+    <div class="row"><button class="btn btn-primary btn-sm" id="pv-use">Use this location</button><button class="btn btn-ghost btn-sm" id="pv-drop">Cancel</button></div>
   </div>`;
   box.querySelectorAll('.cand').forEach(b => b.onclick = () => {
     searchPick = +b.dataset.i; box.querySelectorAll('.cand').forEach(x => x.classList.toggle('is-on', x === b));
@@ -2035,46 +2035,46 @@ function renderCandidates(results, hint) {
 }
 async function searchOne() {
   const q = $('#q').value.trim(); if (!q) return;
-  const btn = $('#q-btn'); btn.disabled = true; btn.textContent = 'Aranıyor…'; setStatus('Mekân aranıyor…');
+  const btn = $('#q-btn'); btn.disabled = true; btn.textContent = 'Searching…'; setStatus('Searching for the place…');
   try { renderCandidates(await geocodeMulti(q, state.active)); }
-  catch (err) { $('#preview').innerHTML = `<div class="preview-card">Arama başarısız: ${esc(err.message)}. İnternet bağlantısını kontrol et.</div>`; }
-  finally { btn.disabled = false; btn.textContent = 'Bul'; setStatus(''); }
+  catch (err) { $('#preview').innerHTML = `<div class="preview-card">Search failed: ${esc(err.message)}. Check your internet connection.</div>`; }
+  finally { btn.disabled = false; btn.textContent = 'Find'; setStatus(''); }
 }
 async function searchFromText() {
   const text = $('#paste').value.trim(); if (!text) return;
   const box = $('#preview');
   if (/instagram\.com|tiktok\.com|youtu/.test(text) && text.replace(/https?:\/\/\S+/g, '').trim().length < 8) {
-    box.innerHTML = `<div class="preview-card">Bağlantıdan mekân çekilemiyor: Instagram/TikTok sayfaları giriş ister ve tarayıcıdan okunamaz. Videonun <b>açıklama metnini</b> (📍 satırı ya da adres) kopyalayıp buraya yapıştır.</div>`;
+    box.innerHTML = `<div class="preview-card">A place cannot be read from a link: Instagram/TikTok pages require login and cannot be fetched from the browser. Copy the video's <b>caption text</b> (the 📍 line or the address) and paste it here.</div>`;
     return;
   }
   const cands = extractCandidates(text);
-  if (!cands.length) { box.innerHTML = `<div class="preview-card">Metinde adres ya da mekân adına benzer bir satır bulunamadı.</div>`; return; }
-  const btn = $('#paste-btn'); btn.disabled = true; btn.textContent = 'Aranıyor…';
+  if (!cands.length) { box.innerHTML = `<div class="preview-card">No line in the text looks like an address or a place name.</div>`; return; }
+  const btn = $('#paste-btn'); btn.disabled = true; btn.textContent = 'Searching…';
   try {
     let found = [], used = '';
     for (const c of cands) {
-      setStatus(`Deneniyor: ${c}`);
+      setStatus(`Trying: ${c}`);
       try { found = await geocodeMulti(c, state.active); } catch {}
       if (found.length) { used = c; break; }
     }
-    renderCandidates(found, used ? `"${used}" satırından bulundu` : '');
+    renderCandidates(found, used ? `Found from the line "${used}"` : '');
     if (found.length) $('#q').value = used;
-  } finally { btn.disabled = false; btn.textContent = 'Metinden bul'; setStatus(''); }
+  } finally { btn.disabled = false; btn.textContent = 'Find from text'; setStatus(''); }
 }
 $('#paste-btn').onclick = searchFromText;
 $('#q-btn').onclick = searchOne;
 $('#q').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); searchOne(); } });
 
 /* =====================================================================
-   Toplu ekleme tablosu
+   Bulk add table
    ===================================================================== */
 const bulkRows = $('#bulk-rows');
 function addBulkRow(name = '', addr = '', score = '') {
   const row = document.createElement('div'); row.className = 'bulk-row';
-  row.innerHTML = `<input type="text" placeholder="Yer adı" value="${esc(name)}">
-    <input type="text" placeholder="Adres" value="${esc(addr)}">
+  row.innerHTML = `<input type="text" placeholder="Place name" value="${esc(name)}">
+    <input type="text" placeholder="Address" value="${esc(addr)}">
     <input type="number" min="1" max="10" placeholder="5" value="${esc(score)}">
-    <button class="icon-btn" type="button" title="Satırı kaldır">×</button>`;
+    <button class="icon-btn" type="button" title="Remove row">×</button>`;
   row.querySelector('button').onclick = () => { row.remove(); if (!bulkRows.children.length) addBulkRow(); };
   bulkRows.appendChild(row);
   return row;
@@ -2089,29 +2089,29 @@ $('#bulk-go').onclick = async () => {
     const [n, a, s] = row.querySelectorAll('input');
     return { row, name: n.value.trim(), addr: a.value.trim(), score: Math.max(1, Math.min(10, parseInt(s.value, 10) || 5)) };
   }).filter(r => r.name || r.addr);
-  if (!rows.length) return toast('Önce tabloya en az bir satır doldur.');
+  if (!rows.length) return toast('Fill in at least one row first.');
   bulkBusy = true; $('#bulk-go').disabled = true;
   const cityKey = state.active;
   let ok = 0, fail = 0;
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    $('#bulk-status').textContent = `${i + 1}/${rows.length} aranıyor…`;
-    setStatus(`Toplu ekleme: ${i + 1}/${rows.length}`);
+    $('#bulk-status').textContent = `Looking up ${i + 1}/${rows.length}…`;
+    setStatus(`Bulk add: ${i + 1}/${rows.length}`);
     r.row.classList.remove('is-error'); r.row.classList.add('is-busy'); r.row.querySelector('.err')?.remove();
-    if (!r.name || !r.addr) { markErr(r.row, 'Ad ve adres gerekli.'); fail++; continue; }
+    if (!r.name || !r.addr) { markErr(r.row, 'Name and address are required.'); fail++; continue; }
     try {
       let res = await geocode(r.addr, cityKey);
       if (!res) res = await geocode(r.name + ' ' + r.addr, cityKey);
-      if (!res) { markErr(r.row, 'Adres bulunamadı — düzeltip tekrar dene.'); fail++; continue; }
+      if (!res) { markErr(r.row, 'Address not found — fix it and try again.'); fail++; continue; }
       state.cities[cityKey].places.push({ id: uid(), name: r.name, cat: res.cat || 'sight', lat: res.lat, lon: res.lon, address: res.address, priority: r.score });
       save(); r.row.remove(); ok++;
       if (cityKey === state.active) { rebuildPins(); recompute(); }
-    } catch (err) { markErr(r.row, 'Arama hatası: ' + err.message); fail++; }
+    } catch (err) { markErr(r.row, 'Lookup error: ' + err.message); fail++; }
   }
   if (!bulkRows.children.length) addBulkRow();
-  $('#bulk-status').textContent = `${ok} eklendi${fail ? `, ${fail} bulunamadı` : ''}.`;
+  $('#bulk-status').textContent = `${ok} added${fail ? `, ${fail} not found` : ''}.`;
   setStatus(''); bulkBusy = false; $('#bulk-go').disabled = false;
-  if (ok) { fitAll(); toast(`${ok} yer eklendi.`); }
+  if (ok) { fitAll(); toast(`${ok} place(s) added.`); }
   function markErr(row, msg) {
     row.classList.remove('is-busy'); row.classList.add('is-error');
     const e = document.createElement('div'); e.className = 'err'; e.textContent = msg; row.appendChild(e);
@@ -2119,27 +2119,27 @@ $('#bulk-go').onclick = async () => {
 };
 
 /* =====================================================================
-   Ulaşım ve bilet panelleri
+   Transit and ticket panels
    ===================================================================== */
 function renderTransit() {
   const def = cityDef();
   $('#transit').innerHTML = def.transit.map(t => `
     <h3 class="sub">${esc(t.title)}<span class="kind">${esc(t.kind)}</span></h3>
-    <table class="t"><thead><tr><th>Ulaşım</th><th>Fiyat</th>${t.time ? '<th>Süre</th>' : ''}<th>Not</th></tr></thead>
+    <table class="t"><thead><tr><th>Transport</th><th>Price</th>${t.time ? '<th>Time</th>' : ''}<th>Note</th></tr></thead>
     <tbody>${t.rows.map(r => t.time
       ? `<tr><td>${esc(r[0])}</td><td class="p">${esc(r[1])}</td><td>${esc(r[2])}</td><td class="n">${esc(r[3])}</td></tr>`
       : `<tr><td>${esc(r[0])}</td><td class="p">${esc(r[1])}</td><td class="n">${esc(r[2])}</td></tr>`).join('')}</tbody></table>`).join('')
-    + (def.transit.every(t => t.kind !== 'Stadyum') ? `<p class="lead" style="margin-top:14px">Bu şehirde planlanmış maç yok; stadyum bilgisi listelenmedi.</p>` : '');
+    + (def.transit.every(t => t.kind !== 'Stadium') ? `<p class="lead" style="margin-top:14px">No match planned in this city, so no stadium information is listed.</p>` : '');
 }
 function renderTickets() {
   const def = cityDef();
   $('#tickets').innerHTML = `<h3 class="sub">${esc(def.name)}</h3>
-    <table class="t"><thead><tr><th>Bilet</th><th>Fiyat</th><th>Not</th></tr></thead>
+    <table class="t"><thead><tr><th>Ticket</th><th>Price</th><th>Note</th></tr></thead>
     <tbody>${def.tickets.map(r => `<tr><td>${esc(r[0])}</td><td class="p">${esc(r[1])}</td><td class="n">${esc(r[2])}</td></tr>`).join('')}</tbody></table>`;
 }
 
 /* =====================================================================
-   Başlat
+   Start
    ===================================================================== */
 switchCity(state.active);
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(() => {});
