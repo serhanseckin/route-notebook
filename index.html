@@ -48,6 +48,7 @@
     --panel-w:420px;
   }
   *{box-sizing:border-box}
+  [hidden]{display:none!important}
   html,body{height:100%;margin:0}
   body{
     font-family:var(--font-body);
@@ -288,6 +289,26 @@
   .journal-day{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:16px;margin:16px 0 8px}
   .unlock{font-size:13px;color:var(--ink-2);margin:0 0 12px}
   .unlock b{color:var(--accent-ink)}
+  #wiz-veil{align-items:center}
+  .wiz{width:min(600px,100%);max-height:94vh;overflow:auto}
+  .wiz-steps{display:flex;gap:12px;font-size:12px;color:var(--muted);margin:0 0 12px;flex-wrap:wrap}
+  .wiz-steps span{padding-bottom:3px;border-bottom:2px solid transparent}
+  .wiz-steps span.is-on{color:var(--ink);font-weight:600;border-bottom-color:var(--accent)}
+  .wiz h2{margin-bottom:6px}
+  .wiz .lead{margin:0 0 12px;color:var(--ink-2);font-size:13.5px}
+  .wiz .sheet-actions{align-items:center}
+  .wiz .spacer{flex:1}
+  .w-day h4{font-family:var(--font-display);font-weight:600;font-size:15px;margin:12px 0 6px}
+  .w-day .meal-bar{margin-bottom:4px}
+  .muted{color:var(--muted);font-weight:400}
+  .lbl .ph.mem{width:42px;height:42px;border-radius:6px;border:2px solid #fff;box-shadow:0 0 0 1.5px var(--ink)}
+  .lbl.is-memory{opacity:1;background:#fffdf7}
+  .weather{font-size:12.5px;color:var(--ink-2);margin:-4px 0 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .weather b{color:var(--ink)}
+  .weather button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:2px 9px;font-size:12px;color:var(--teal)}
+  .day-bar button .wx{font-size:12px;margin-left:2px}
+  .trip-card .btn{margin-left:auto}
+  .trip-card h4{display:flex;align-items:center;gap:6px}
   .step-note{font-size:12.5px;color:var(--ink-2);font-style:italic;margin-top:2px}
   .hotel-card .note{font-size:12.5px;color:var(--ink-2);font-style:italic}
   .leg .dirs{margin-top:4px}
@@ -606,7 +627,7 @@
       <div class="scene-fx"></div>
       <div class="labels" id="labels"></div>
       <div class="scene-ui">
-        <div class="scene-hint"><b>Tap</b> the ground → add a place · drag → rotate · scroll/pinch → zoom · pan → the map fills in as you explore</div>
+        <div class="scene-hint"><b>Double-tap</b> the ground → add a place · drag → move · pinch/scroll → zoom · two fingers or right-drag → rotate · the map fills in as you explore</div>
         <div class="scene-status" id="scene-status"></div>
         <div class="scene-tools">
           <button class="btn btn-sm btn-ghost" id="walk-btn" title="Walk the route with a little figure">▶ Walk</button>
@@ -658,7 +679,7 @@
           <h2 class="sec" id="route-title">Walking route</h2>
           <p class="lead">Starts at the hotel and favours high-priority places. Recalculates itself on every change.</p>
           <div class="trip-card" id="trip-card">
-            <h4>Your stay<small id="trip-days"></small></h4>
+            <h4>Your stay<small id="trip-days"></small><button type="button" class="btn btn-sm btn-ghost" id="wiz-btn" title="Name, dates, bucket list and meals in three steps">Plan wizard</button></h4>
             <div class="trip-row">
               <label>Arrive <input type="datetime-local" id="trip-arrive" class="input"></label>
               <label>Leave <input type="datetime-local" id="trip-depart" class="input"></label>
@@ -671,6 +692,7 @@
             </div>
           </div>
           <div class="day-bar" id="day-bar"></div>
+          <div class="weather" id="weather" hidden></div>
           <div class="meal-bar" id="meal-bar"></div>
           <div class="summary" id="route-summary"></div>
           <div id="hotel-card"></div>
@@ -728,6 +750,7 @@
           <p class="lead">Every place you really reach unlocks a page: a photo of what you had and a few words. Badges collect along the way.</p>
           <div class="badges" id="badges"></div>
           <div id="journal"></div>
+          <div class="page-foot"><button class="btn btn-sm" id="book-btn" title="A single HTML page with every journal entry and photo — print it to PDF">Download memory book</button></div>
         </div>
 
         <!-- TRANSIT -->
@@ -810,6 +833,41 @@
   </form>
 </div>
 
+<!-- Trip wizard -->
+<div class="veil" id="wiz-veil">
+  <div class="sheet wiz" id="wiz">
+    <div class="wiz-steps"><span data-s="1" class="is-on">1 · You & your dates</span><span data-s="2">2 · Bucket list</span><span data-s="3">3 · Meals</span></div>
+    <section data-step="1">
+      <h2>Plan a trip</h2>
+      <p class="lead">Three quick steps: who and when, what you want to see, then where you eat each day.</p>
+      <div class="field"><label for="w-name">Your name</label><input class="input" id="w-name" autocomplete="off"></div>
+      <div class="field"><label>City</label><div class="chips" id="w-city"></div></div>
+      <div class="trip-row"><label>Arrive <input type="datetime-local" id="w-arrive" class="input"></label><label>Leave <input type="datetime-local" id="w-depart" class="input"></label></div>
+      <div class="field" style="margin-top:12px"><label for="w-hotel">Hotel <span class="muted">name or address, optional</span></label><input class="input" id="w-hotel" placeholder="e.g. Itaca Hostel, Carrer de Ripoll 21" autocomplete="off"></div>
+    </section>
+    <section data-step="2" hidden>
+      <h2>Your bucket list</h2>
+      <p class="lead">Write the places you want to see, straight from your head, and how much you want to go (1–10). Each one is looked up on the map.</p>
+      <div class="bulk">
+        <div class="bulk-head"><div>Place</div><div>Address <span class="muted">optional</span></div><div>Want</div><div></div></div>
+        <div id="w-rows"></div>
+      </div>
+      <div class="bulk-foot"><button type="button" class="btn btn-ghost btn-sm" id="w-add-row">+ Row</button><span class="bulk-status" id="w-status"></span></div>
+    </section>
+    <section data-step="3" hidden>
+      <h2>Meals, day by day</h2>
+      <p class="lead">Pick breakfast, lunch and dinner for each day from your list. Everything else is arranged around them.</p>
+      <div id="w-meals"></div>
+    </section>
+    <div class="sheet-actions">
+      <button type="button" class="btn btn-ghost" id="w-skip">Skip</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-ghost" id="w-back" hidden>Back</button>
+      <button type="button" class="btn btn-primary" id="w-next">Next</button>
+    </div>
+  </div>
+</div>
+
 <!-- Journal entry -->
 <div class="veil" id="journal-veil">
   <form class="sheet" id="journal-form">
@@ -863,7 +921,7 @@
 
 <script type="module">
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { MapControls } from 'three/addons/controls/MapControls.js';
 
 /* =====================================================================
    Embedded reference data
@@ -1120,13 +1178,15 @@ scene.fog = new THREE.Fog(COLORS.bg, 1500, 4600);
 const camera = new THREE.PerspectiveCamera(45, 1, 1, 30000);
 camera.position.set(220, 260, 300);
 
-const controls = new OrbitControls(camera, canvas);
+const controls = new MapControls(camera, canvas); // one finger / left-drag pans, two fingers or right-drag rotate
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.maxPolarAngle = 1.38;
 controls.minDistance = 12;
 controls.maxDistance = 9000;
 controls.screenSpacePanning = false;
+controls.zoomToCursor = true;      // wheel / pinch zooms towards the cursor
+controls.panSpeed = 1.2;
 
 const hemi = new THREE.HemisphereLight(0xfff6e4, 0xbfae8a, 1.05); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff3df, 1.9);
@@ -1816,7 +1876,9 @@ function rebuildLabels() {
   const add = (obj, cls, num, text, id) => {
     const el = document.createElement('div');
     el.className = 'lbl ' + cls + (id && id === selectedId ? ' is-selected' : '');
-    const ph = id && photos[id] ? `<img class="ph" src="${photos[id]}" alt="">` : '';
+    const jp = id && photos['j:' + id];
+    if (jp) el.classList.add('is-memory');
+    const ph = jp ? `<img class="ph mem" src="${jp}" alt="">` : (id && photos[id] ? `<img class="ph" src="${photos[id]}" alt="">` : '');
     el.innerHTML = `<span class="n">${esc(num)}</span>${ph}<span class="t">${esc(text)}</span>`;
     labelsEl.appendChild(el);
     labelEntries.push({ el, obj });
@@ -1892,6 +1954,7 @@ const raycaster = new THREE.Raycaster();
 const ndc = new THREE.Vector2();
 let down = null;
 canvas.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+let lastTap = null;
 canvas.addEventListener('pointerup', e => {
   if (!down) return;
   const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
@@ -1903,13 +1966,20 @@ canvas.addEventListener('pointerup', e => {
   const hitPin = raycaster.intersectObjects([...pinObjects.values()], true)[0];
   if (hitPin) {
     let g = hitPin.object; while (g && !g.userData.id) g = g.parent;
-    if (g) { selectPlace(g.userData.id); showPlaceCard(g.userData.id); return; }
+    if (g) { lastTap = null; selectPlace(g.userData.id); showPlaceCard(g.userData.id); return; }
   }
+  const now = performance.now();
+  if (lastTap && now - lastTap.t < 380 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 28) {
+    // double-tap on the ground → add a place there
+    lastTap = null; hidePlaceCard();
+    const hit = raycaster.intersectObject(ground)[0];
+    if (!hit) return;
+    const { lat, lon } = unproject(hit.point.x, hit.point.z);
+    openSheet({ lat, lon, address: '' });
+    return;
+  }
+  lastTap = { t: now, x: e.clientX, y: e.clientY };
   hidePlaceCard();
-  const hit = raycaster.intersectObject(ground)[0];
-  if (!hit) return;
-  const { lat, lon } = unproject(hit.point.x, hit.point.z);
-  openSheet({ lat, lon, address: '' });
 });
 
 function selectPlace(id, fly = false) {
@@ -2143,6 +2213,43 @@ function renderDayBar(c) {
   $('#trip-days').textContent = n ? `${n} day${n > 1 ? 's' : ''} · ${c.arrive.slice(0, 10)} → ${c.depart.slice(0, 10)}` : 'set arrival and departure to plan the days';
   $('#trip-card').classList.toggle('is-unset', !n);
   renderMealBar(c);
+  const cityKey = state.active;
+  $('#weather').hidden = true;
+  loadWeather(cityKey, c).then(wx => {
+    if (state.active !== cityKey || !wx) return;
+    bar.querySelectorAll('button[data-day]').forEach(b => { const w = wx[+b.dataset.day - 1]; if (w && b.dataset.day !== 'new') b.insertAdjacentHTML('beforeend', `<span class="wx" title="${w.tmin}–${w.tmax}°, rain ${w.rain}%">${wxIcon(w.code)}</span>`); });
+    renderWeather(c, wx);
+  });
+}
+const WX = { cache: new Map() };
+const wxIcon = c => c === 0 ? '☀️' : c <= 2 ? '🌤' : c === 3 ? '☁️' : c <= 48 ? '🌫' : c <= 57 ? '🌦' : c <= 67 ? '🌧' : c <= 77 ? '❄️' : c <= 82 ? '🌦' : '⛈';
+async function loadWeather(cityKey, c) {
+  const n = tripDays(c); if (!n || !c.arrive) return null;
+  const key = cityKey + '|' + c.arrive.slice(0, 10) + '|' + n;
+  if (WX.cache.has(key)) return WX.cache.get(key);
+  const start = c.arrive.slice(0, 10); const end = new Date(start + 'T12:00:00'); end.setDate(end.getDate() + n - 1);
+  const ctr = CITIES[cityKey].center;
+  const pr = (async () => {
+    try {
+      const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${ctr.lat}&longitude=${ctr.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&start_date=${start}&end_date=${end.toISOString().slice(0, 10)}`);
+      if (!r.ok) return null;
+      const j = await r.json();
+      return (j.daily?.time || []).map((t, i) => ({ date: t, code: j.daily.weathercode[i], tmax: Math.round(j.daily.temperature_2m_max[i]), tmin: Math.round(j.daily.temperature_2m_min[i]), rain: j.daily.precipitation_probability_max[i] ?? 0 }));
+    } catch { return null; }
+  })();
+  WX.cache.set(key, pr); return pr;
+}
+const INDOOR = new Set(['museum', 'cafe', 'restaurant', 'bar', 'shop']);
+function renderWeather(c, wx) {
+  const box = $('#weather'); const d = c.day || 1; const w = wx && wx[d - 1];
+  if (!w) { box.hidden = true; return; }
+  const rainy = w.rain >= 50 || (w.code >= 51 && w.code <= 67) || w.code >= 80, sunny = w.code <= 2 && w.rain < 30;
+  const others = c.places.filter(p => (p.day || 1) !== d && !p.visited);
+  const picks = rainy ? others.filter(p => INDOOR.has(catOf(p))) : sunny ? others.filter(p => ['park', 'sight'].includes(catOf(p))) : [];
+  box.innerHTML = `<b>${wxIcon(w.code)} Day ${d}</b> ${w.tmin}–${w.tmax}° · rain ${w.rain}%` +
+    (rainy ? ` · <b>rainy</b>: favour indoor stops` : sunny ? ` · <b>sunny</b>: good for parks and views` : '') +
+    (picks.length ? ` · move here: ` + picks.slice(0, 3).map(p => `<button data-act="move-here" data-id="${p.id}">${CATS[catOf(p)].emoji} ${esc(p.name)} (Day ${p.day})</button>`).join('') : '');
+  box.hidden = false;
 }
 function renderMealBar(c) {
   const d = c.day || 1;
@@ -2268,6 +2375,7 @@ $('#panel-body').addEventListener('click', async e => {
     }
     return;
   }
+  if (act === 'move-here') { const q = c.places.find(x => x.id === btn.dataset.id); if (q) { q.day = c.day || 1; delete q.slot; save(); rebuildPins(); recompute(); toast(`${q.name} moved to Day ${c.day || 1}.`); } return; }
   if (act === 'unvisit') { const q = c.places.find(x => x.id === btn.dataset.id); if (q) { q.visited = false; save(); rebuildPins(); recompute(); } return; }
   if (act === 'journal') { const q = c.places.find(x => x.id === btn.dataset.id); if (q) openJournal(q, false); return; }
   if (act === 'jedit') { for (const k of CITY_KEYS) { const q = state.cities[k].places.find(x => x.id === btn.dataset.id); if (q) { openJournal(q, false); break; } } return; }
@@ -2369,12 +2477,29 @@ async function importShareFromHash() {
   try {
     const d = await unpackShare(m[1]);
     if (!d || !CITIES[d.city]) throw new Error('bad payload');
-    const n = (d.places || []).length;
-    if (!(await confirmDialog(`Import a shared plan for ${CITIES[d.city].name}?`, `${n} place(s)${d.hotel ? ' and a hotel' : ''}. This replaces what you have for ${CITIES[d.city].name}.`, 'Import'))) return;
-    state.cities[d.city] = normalizeCity({ hotel: d.hotel || null, places: d.places || [], day: 1, days: d.days || 1, startMin: d.startMin ?? 570, date: d.date || todayISO() });
+    const n = (d.places || []).length, name = CITIES[d.city].name, local = state.cities[d.city];
+    const hasLocal = !!(local.hotel || local.places.length);
+    let mode = 'replace';
+    if (hasLocal) {
+      if (await confirmDialog(`Merge the shared ${name} plan into yours?`, `${n} place(s). Merge keeps your list and adds what is new (places within 30 m or with the same name are matched). Cancel to replace instead.`, 'Merge')) mode = 'merge';
+      else if (!(await confirmDialog(`Replace your ${name} list?`, `Your current places for ${name} will be replaced by the shared plan.`, 'Replace'))) return;
+    } else if (!(await confirmDialog(`Import a shared plan for ${name}?`, `${n} place(s)${d.hotel ? ' and a hotel' : ''}.`, 'Import'))) return;
+    if (mode === 'merge') {
+      let added = 0;
+      for (const q of d.places || []) {
+        const dup = local.places.find(x => haversine(x, q) < 30 || x.name.trim().toLowerCase() === (q.name || '').trim().toLowerCase());
+        if (dup) { if (!dup.note && q.note) dup.note = q.note; if (!dup.hours && q.hours) dup.hours = q.hours; continue; }
+        local.places.push({ ...q, id: uid(), visited: false, journal: undefined, day: Math.min(q.day || 1, Math.max(local.days || 1, q.day || 1)) }); added++;
+      }
+      if (!local.hotel && d.hotel) local.hotel = { ...d.hotel, id: uid() };
+      normalizeCity(local);
+      toast(`${added} new place(s) merged into ${name}.`);
+    } else {
+      state.cities[d.city] = normalizeCity({ hotel: d.hotel || null, places: d.places || [], day: 1, days: d.days || 1, startMin: d.startMin ?? 570, date: d.date || todayISO() });
+      toast('Plan imported.');
+    }
     state.active = d.city; save();
     switchCity(d.city); fitAll();
-    toast('Plan imported.');
   } catch (e) { toast('This link could not be read.'); }
 }
 
@@ -2804,6 +2929,103 @@ function renderJournal() {
   }).join('')).join('');
 }
 
+// ---- Memory book: one printable HTML page with every journal entry ----
+$('#book-btn').onclick = () => {
+  const all = []; for (const k of CITY_KEYS) for (const p of state.cities[k].places) if (p.visited) all.push({ ...p, cityKey: k });
+  if (!all.length) return toast('No journal pages yet.');
+  all.sort((a, b) => (a.visitedAt || '').localeCompare(b.visitedAt || ''));
+  const badges = BADGES.filter(([, , , test]) => test(all)).map(([, e, l]) => `<span>${e} ${esc(l)}</span>`).join('');
+  const groups = new Map(); for (const p of all) { const g = `${CITIES[p.cityKey].name} · Day ${p.day || 1}`; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(p); }
+  const body = [...groups.entries()].map(([g, ps]) => `<h2>${esc(g)}</h2>` + ps.map(p => { const ph = photos['j:' + p.id] || photos[p.id]; const when = p.visitedAt ? new Date(p.visitedAt).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'long' }) : '';
+    return `<article>${ph ? `<img src="${ph}" alt="">` : ''}<div><h3>${CATS[catOf(p)].emoji} ${esc(p.name)}</h3><p class="m">${esc(when)}${p.address ? ' · ' + esc(p.address.split(',').slice(0, 2).join(',')) : ''}</p>${p.note ? `<p class="n">${esc(p.note)}</p>` : ''}<p class="j">${esc((p.journal && p.journal.text) || '')}</p></div></article>`; }).join('')).join('');
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${esc(userName())}'s memory book</title>
+<style>body{font:15px/1.5 Georgia,serif;color:#2a2723;background:#f4eee2;margin:0;padding:32px;max-width:820px;margin:auto}h1{font-size:34px;margin:0 0 4px}.sub{color:#8a8270;margin:0 0 20px}.badges span{display:inline-block;border:1px solid #d6a52f;border-radius:999px;padding:3px 10px;margin:0 6px 6px 0;font-size:13px;background:#fbf3e2}h2{font-style:italic;font-size:20px;border-bottom:1.5px solid #2a2723;padding-bottom:4px;margin:28px 0 12px}article{display:flex;gap:16px;align-items:flex-start;margin:0 0 18px;page-break-inside:avoid}article img{width:180px;height:180px;object-fit:cover;border:6px solid #fff;box-shadow:2px 2px 0 #2a2723;flex:none}h3{margin:0;font-size:18px}.m{color:#8a8270;font-size:13px;margin:2px 0 6px}.n{font-family:"Segoe Script","Bradley Hand",cursive;margin:0 0 6px;color:#55503f}.j{font-size:17px;white-space:pre-wrap;margin:0}@media print{body{background:#fff;padding:0}}</style></head>
+<body><h1>${esc(userName())}'s memory book</h1><p class="sub">Route Notebook · ${all.length} place${all.length > 1 ? 's' : ''} · exported ${new Date().toLocaleDateString()}</p><div class="badges">${badges}</div>${body}</body></html>`;
+  download('route-notebook-memories.html', html, 'text/html');
+  toast('Memory book downloaded — open it and print to PDF if you like.');
+};
+
+// ---- Trip wizard: you & dates → bucket list → meals ----
+const wiz = { step: 1, city: 'barcelona' };
+function openWizard() {
+  wiz.city = state.active;
+  $('#w-name').value = userName(); renderWizCity();
+  const c = state.cities[wiz.city]; $('#w-arrive').value = c.arrive || ''; $('#w-depart').value = c.depart || ''; $('#w-hotel').value = c.hotel ? c.hotel.name : '';
+  if (!$('#w-rows').children.length) for (let i = 0; i < 4; i++) addWizRow();
+  $('#w-status').textContent = '';
+  showWizStep(1); $('#wiz-veil').classList.add('is-open');
+}
+function closeWizard() { $('#wiz-veil').classList.remove('is-open'); state.setupDone = true; save(); }
+function renderWizCity() { $('#w-city').innerHTML = CITY_KEYS.map(k => `<button type="button" data-v="${k}" class="${k === wiz.city ? 'is-on' : ''}">${CITIES[k].name}</button>`).join(''); }
+$('#w-city').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; wiz.city = b.dataset.v; renderWizCity(); const c = state.cities[wiz.city]; $('#w-arrive').value = c.arrive || ''; $('#w-depart').value = c.depart || ''; $('#w-hotel').value = c.hotel ? c.hotel.name : ''; });
+function showWizStep(n) {
+  wiz.step = n;
+  document.querySelectorAll('#wiz section').forEach(x => x.hidden = +x.dataset.step !== n);
+  document.querySelectorAll('.wiz-steps span').forEach(x => x.classList.toggle('is-on', +x.dataset.s === n));
+  $('#w-back').hidden = n === 1; $('#w-next').textContent = n === 3 ? 'Finish' : 'Next';
+}
+function addWizRow() {
+  const row = document.createElement('div'); row.className = 'bulk-row';
+  row.innerHTML = `<input type="text" placeholder="e.g. Bar Cañete"><input type="text" placeholder="street or area"><input type="number" min="1" max="10" placeholder="7"><button class="icon-btn" type="button" title="Remove row">×</button>`;
+  row.querySelector('button').onclick = () => row.remove();
+  $('#w-rows').appendChild(row); return row;
+}
+$('#w-add-row').onclick = () => addWizRow().querySelector('input').focus();
+$('#w-skip').onclick = closeWizard;
+$('#w-back').onclick = () => showWizStep(wiz.step - 1);
+$('#w-next').onclick = async () => {
+  const c = state.cities[wiz.city];
+  if (wiz.step === 1) {
+    const nm = $('#w-name').value.trim(); if (nm) { state.user = { name: nm }; renderUser(); }
+    c.arrive = $('#w-arrive').value || ''; c.depart = $('#w-depart').value || ''; normalizeCity(c);
+    state.active = wiz.city; save();
+    const h = $('#w-hotel').value.trim();
+    if (h && !(c.hotel && c.hotel.name === h)) {
+      $('#w-next').disabled = true;
+      try { const r = await geocode(h, wiz.city); if (r) { c.hotel = { id: uid(), name: r.name || h, note: '', lat: r.lat, lon: r.lon, address: r.address }; save(); toast('Hotel set: ' + c.hotel.name); } else toast('Hotel not found — add it later from the map.'); }
+      finally { $('#w-next').disabled = false; }
+    }
+    showWizStep(2); return;
+  }
+  if (wiz.step === 2) {
+    const rows = [...$('#w-rows').children].map(row => { const [n, a, sc] = row.querySelectorAll('input'); return { row, name: n.value.trim(), addr: a.value.trim(), score: Math.max(1, Math.min(10, parseInt(sc.value, 10) || 7)) }; }).filter(r => r.name);
+    if (rows.length) {
+      $('#w-next').disabled = true; let ok = 0, fail = 0;
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i]; $('#w-status').textContent = `Looking up ${i + 1}/${rows.length}…`;
+        r.row.classList.remove('is-error'); r.row.querySelector('.err')?.remove();
+        try {
+          let res = await geocode(r.addr ? r.name + ' ' + r.addr : r.name, wiz.city);
+          if (!res && r.addr) res = await geocode(r.addr, wiz.city);
+          if (!res) { r.row.classList.add('is-error'); const e = document.createElement('div'); e.className = 'err'; e.textContent = 'Not found — add a street or area, or leave it and press Next again.'; r.row.appendChild(e); fail++; continue; }
+          addPlaceFromResult(wiz.city, r.name, res, r.score, 1); r.row.remove(); ok++;
+        } catch { fail++; }
+      }
+      $('#w-status').textContent = `${ok} added${fail ? `, ${fail} not found` : ''}.`; $('#w-next').disabled = false;
+      if (fail) { toast(`${fail} place(s) not found — fix them, or press Next again to go on.`); return; }
+    }
+    if (!c.places.length) { toast('Add at least one place, or Skip.'); return; }
+    if (!$('#w-rows').children.length) addWizRow();
+    renderWizMeals(c); showWizStep(3); return;
+  }
+  closeWizard(); switchCity(wiz.city); showPage('route'); fitAll();
+  toast(`Your ${CITIES[wiz.city].name} plan is ready — tap ▶ Walk to preview it.`, 4000);
+};
+function renderWizMeals(c) {
+  const cands = c.places.slice().sort((a, b) => (b.priority || 5) - (a.priority || 5));
+  $('#w-meals').innerHTML = Array.from({ length: c.days || 1 }, (_, i) => i + 1).map(d => `<div class="w-day"><h4>Day ${d}${d === 1 && c.arrive ? ` · from ${hhmm(dayStartMin(c, 1))}` : ''}${d === (c.days || 1) && c.depart ? ` · until ${hhmm(dayEndMin(c, d) ?? 1439)}` : ''}</h4><div class="meal-bar">${MEALS.map(([k, e, label]) => {
+    const cur = c.places.find(p => p.slot === k && (p.day || 1) === d);
+    return `<label class="meal ${cur ? 'is-set' : ''}"><span>${e} ${label} <small>${hhmm(c.meals[k])}</small></span><select data-day="${d}" data-slot="${k}"><option value="">—</option>${cands.map(p => `<option value="${p.id}" ${cur && cur.id === p.id ? 'selected' : ''}>${CATS[catOf(p)].emoji} ${esc(p.name)} · P${p.priority || 5}</option>`).join('')}</select></label>`; }).join('')}</div></div>`).join('');
+}
+$('#w-meals').addEventListener('change', e => {
+  const sel = e.target.closest('select[data-slot]'); if (!sel) return;
+  const c = state.cities[wiz.city], d = +sel.dataset.day, k = sel.dataset.slot;
+  c.places.forEach(p => { if (p.slot === k && (p.day || 1) === d) delete p.slot; });
+  if (sel.value) { const p = c.places.find(x => x.id === sel.value); if (p) { p.slot = k; p.day = d; } }
+  save(); renderWizMeals(c);
+});
+$('#wiz-btn').onclick = openWizard;
+
 /* =====================================================================
    Add page: single search + preview
    ===================================================================== */
@@ -2879,6 +3101,15 @@ for (let i = 0; i < 3; i++) addBulkRow();
 $('#bulk-add-row').onclick = () => { addBulkRow().querySelector('input').focus(); };
 
 let bulkBusy = false;
+function addPlaceFromResult(cityKey, name, res, priority, day) {
+  const c = state.cities[cityKey];
+  const place = { id: uid(), name, cat: res.cat || 'sight', day: day || c.day || 1, stay: 0, hours: res.hours || '', osm: res.osm || null, lat: res.lat, lon: res.lon, address: res.address, priority };
+  c.places.push(place);
+  if (!place.hours && place.osm) fetchHours(place);
+  save();
+  if (cityKey === state.active) { rebuildPins(); recompute(); }
+  return place;
+}
 $('#bulk-go').onclick = async () => {
   if (bulkBusy) return;
   const rows = [...bulkRows.children].map(row => {
@@ -2899,11 +3130,8 @@ $('#bulk-go').onclick = async () => {
       let res = await geocode(r.addr, cityKey);
       if (!res) res = await geocode(r.name + ' ' + r.addr, cityKey);
       if (!res) { markErr(r.row, 'Address not found — fix it and try again.'); fail++; continue; }
-      const place = { id: uid(), name: r.name, cat: res.cat || 'sight', day: state.cities[cityKey].day || 1, stay: 0, hours: res.hours || '', osm: res.osm || null, lat: res.lat, lon: res.lon, address: res.address, priority: r.score };
-      state.cities[cityKey].places.push(place);
-      if (!place.hours && place.osm) fetchHours(place);
-      save(); r.row.remove(); ok++;
-      if (cityKey === state.active) { rebuildPins(); recompute(); }
+      addPlaceFromResult(cityKey, r.name, res, r.score);
+      r.row.remove(); ok++;
     } catch (err) { markErr(r.row, 'Lookup error: ' + err.message); fail++; }
   }
   if (!bulkRows.children.length) addBulkRow();
@@ -2942,6 +3170,7 @@ function renderTickets() {
 switchCity(state.active);
 followRealTime();
 importShareFromHash();
+if (!state.setupDone && CITY_KEYS.every(k => !state.cities[k].places.length && !state.cities[k].hotel) && !location.hash.includes('share=')) openWizard();
 window.addEventListener('hashchange', importShareFromHash);
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(() => {});
 </script>

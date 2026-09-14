@@ -21,10 +21,19 @@ Live: https://serhanseckin.github.io/route-notebook/
 - Hand-made landmarks (Sagrada Família, Duomo di Milano, the Colosseum), a drawn sea for
   Barcelona, rivers and canals, paper grain and handwritten labels.
 - A little figure can walk the whole route at 20× speed, pausing at every stop with your note.
+- Map-style controls: drag to move, pinch or scroll to zoom towards the cursor, two fingers or
+  right-drag to rotate, double-tap the ground to add a place.
+
+**Getting started**
+- A three-step wizard: your name, city and dates (plus hotel) → your bucket list, straight from
+  your head with a 1–10 "want" score, looked up on the map → breakfast, lunch and dinner for
+  every day. It opens on first launch and is always one tap away ("Plan wizard").
+- Weather for your dates from Open-Meteo: an icon on each day tab and a hint that suggests
+  moving indoor places to rainy days and parks to sunny ones.
 
 **Places**
-- Add by tapping the ground, by name or address (Photon + Nominatim), by pasting text such as
-  an Instagram caption, or in bulk from a table. Results far from the city are flagged.
+- Add by double-tapping the ground, by name or address (Photon + Nominatim), by pasting text
+  such as an Instagram caption, or in bulk from a table. Results far from the city are flagged.
 - Types with their own pin heads (café cup, restaurant cloche, cocktail glass, temple,
   obelisk, shopping bag, tree, star), detected from OSM tags.
 - Note, photo (resized, stored on the device), priority 1–10, time to spend, opening hours
@@ -49,6 +58,8 @@ Live: https://serhanseckin.github.io/route-notebook/
   and a few words. The Journal tab collects the pages by city and day, with badges such as
   First stop, Foodie, Storyteller, Full day and Three cities.
 - The little walker carries your name; set it by tapping the name next to the title.
+- Visited pins show the photo you took as a small polaroid on the 3D map.
+- Memory book: one printable HTML page with every journal entry, photo and badge.
 
 **On the road**
 - Live location on the 3D map; the route restarts from where you are and the clock is "now".
@@ -58,7 +69,8 @@ Live: https://serhanseckin.github.io/route-notebook/
 - Offline pack: downloads the map cells and street routes for every day of a city.
 
 **Sharing**
-- Share link: the whole city plan compressed into a URL, importable on any device.
+- Share link: the whole city plan compressed into a URL; on import you can merge it into your
+  own list (matching places are de-duplicated) or replace it.
 - Export everything as JSON, or today's route as GPX (waypoints + track).
 
 **Transit panels** for airports, match-day stadiums and city tickets.
