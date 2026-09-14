@@ -1,0 +1,17 @@
+{
+  "name": "Rota Defteri",
+  "short_name": "Rota Defteri",
+  "description": "Barcelona · Milano · Roma için low-poly 3D yürüme rotası planlayıcı",
+  "lang": "tr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4eee2",
+  "theme_color": "#f4eee2",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
