@@ -13,11 +13,13 @@ Live: https://serhanseckin.github.io/route-notebook/
 
 **The map**
 - Real low-poly city: buildings, streets, water, parks and beaches from OpenStreetMap.
-  The city centres ship as static bundles (`data/map-*.json`) and render instantly; areas
-  around your places are fetched from the Overpass API in 800 m cells and cached on the device.
+  A 4 km square around each city centre ships as a static bundle (`data/map-*.json`) and
+  renders instantly; the areas around your places, and wherever you pan the camera, are
+  fetched from the Overpass API in 800 m cells and cached on the device.
+- The scene follows the real clock: sun, sky and shadows change through the day, and street
+  lamps switch on at dusk. Scrub the time slider to preview any hour; "now" returns to the clock.
 - Hand-made landmarks (Sagrada Família, Duomo di Milano, the Colosseum), a drawn sea for
-  Barcelona, rivers and canals, time-of-day lighting from dawn to night, paper grain and
-  handwritten labels.
+  Barcelona, rivers and canals, paper grain and handwritten labels.
 - A little figure can walk the whole route at 20× speed, pausing at every stop with your note.
 
 **Places**
