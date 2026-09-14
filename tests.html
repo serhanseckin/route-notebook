@@ -155,6 +155,34 @@ t('explainStep', () => {
   eq(C.explainStep(steps, 2, { wait: 20, opensAt: 12 * 60 }), 'Timed after it opens at 12:00');
 });
 
+
+t('route with a fixed end keeps it last', () => {
+  const hotel = { id: 'h', name: 'H', lat: 41.3874, lon: 2.1686 };
+  const r = C.computeRoute({ hotel, places: [P('A', 41.3919, 2.1686, 5), P('B', 41.3960, 2.1686, 5)] }, { end: P('L', 41.3890, 2.1750, 5) });
+  eq(r.steps.map(s => s.node.name).join('>'), 'H>A>B>L');
+});
+t('anchored day: lunch fixed at 13:30, free places split around it', () => {
+  const hotel = { id: 'h', name: 'H', lat: 41.3874, lon: 2.1686 };
+  const places = [
+    { id: 'L', name: 'Lunch', lat: 41.3900, lon: 2.1700, priority: 5, slot: 'lunch', slotMin: 13 * 60 + 30 },
+    { id: 'M', name: 'Museum', lat: 41.3890, lon: 2.1690, priority: 5 },
+    { id: 'P', name: 'Park', lat: 41.3960, lon: 2.1760, priority: 5 },
+  ];
+  const sched = { startMin: 10 * 60, dow: 0, stayOf: n => n.name === 'Museum' ? 120 : 45, hoursOf: () => null };
+  const r = C.computeRouteAnchored({ hotel, places }, { schedule: sched });
+  const names = r.steps.map(s => s.node.name);
+  eq(names[0], 'H'); if (names.indexOf('Lunch') < 0) throw new Error('lunch missing');
+  eq(r.anchored, true); eq(r.steps.length, 4);
+  const sc = C.scheduleSteps(r.steps, sched);
+  const li = names.indexOf('Lunch');
+  if (Math.abs(sc.items[li].arrive - (13 * 60 + 30)) > 0.01 && !sc.items[li].late) throw new Error('lunch not at 13:30: ' + sc.items[li].arrive);
+});
+t('schedule: end-of-day cutoff flags late stops', () => {
+  const steps = [{ node: { isHotel: true, name: 'H' }, timeMin: 0 }, { node: { name: 'A' }, timeMin: 30 }, { node: { name: 'B' }, timeMin: 30 }];
+  const r = C.scheduleSteps(steps, { startMin: 17 * 60, stayOf: () => 60, endMin: 18 * 60 });
+  eq(r.items[1].afterEnd, false); eq(r.items[2].afterEnd, true); eq(r.overrun, true);
+});
+
 document.getElementById('summary').textContent = `${pass} passed, ${fail} failed`;
 document.title = (fail ? 'FAIL ' : 'OK ') + document.title;
 </script>

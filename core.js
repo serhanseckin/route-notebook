@@ -35,10 +35,12 @@
     const legOf = opts.legOf || (() => null);
     const warnM = opts.warnM ?? 1800;
     const places = c.places || [];
-    if (!places.length && !c.hotel) return null;
-    const nodes = c.hotel ? [{ ...c.hotel, isHotel: true }, ...places] : [...places];
+    const end = opts.end || null;
+    if (!places.length && !c.hotel && !end) return null;
+    const nodes = (c.hotel ? [{ ...c.hotel, isHotel: true }, ...places] : [...places]).concat(end ? [end] : []);
     const n = nodes.length;
     if (n === 1) return finish(nodes, [0]);
+    const lastFixed = end ? n - 1 : -1;
 
     const cost = nodes.map((a, i) => nodes.map((b, j) => (i === j ? 0 : routingCost(a, b))));
     const sched = opts.schedule || null;
@@ -69,17 +71,20 @@
 
     const visited = new Array(n).fill(false);
     let order = [0]; visited[0] = true;
-    for (let k = 1; k < n; k++) {
+    if (lastFixed >= 0) visited[lastFixed] = true;
+    for (let k = 1; k < n - (lastFixed >= 0 ? 1 : 0); k++) {
       const last = order[order.length - 1];
       let best = -1, bc = Infinity;
       for (let j = 0; j < n; j++) if (!visited[j] && cost[last][j] < bc) { bc = cost[last][j]; best = j; }
       order.push(best); visited[best] = true;
     }
+    if (lastFixed >= 0) order.push(lastFixed);
+    const jMax = lastFixed >= 0 ? n - 2 : n - 1;
     let best = total(order), improved = true, guard = 0;
     while (improved && guard++ < 200) {
       improved = false;
-      for (let i = 1; i < n - 1; i++) {
-        for (let j = i + 1; j < n; j++) {
+      for (let i = 1; i < jMax; i++) {
+        for (let j = i + 1; j <= jMax; j++) {
           const cand = order.slice(0, i).concat(order.slice(i, j + 1).reverse(), order.slice(j + 1));
           const t = total(cand);
           if (t < best - 1e-9) { best = t; order = cand; improved = true; }
@@ -269,6 +274,48 @@
   function closesAt(oh, dow, t) { if (oh.always) return null; const iv = ohIntervals(oh, dow).find(([a, b]) => t >= a && t < b); return iv ? iv[1] : null; }
   const hhmm = m => { m = Math.round(m); const d = Math.floor(m / 1440); m -= d * 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0') + (d > 0 ? '+' + d : ''); };
 
+
+  // ---------- Anchored days: meals (or any fixed-time stop) split the day into segments ----------
+  // Places with slotMin (minutes of day) are visited at that time, in time order. Free places are
+  // assigned to the segment where they cause the least detour (with a soft time budget), then each
+  // segment is ordered with computeRoute() from the previous anchor to the next.
+  function computeRouteAnchored(c, opts = {}) {
+    const all = c.places || [];
+    const anchors = all.filter(p => p.slotMin != null).sort((a, b) => a.slotMin - b.slotMin);
+    if (!anchors.length) return computeRoute(c, opts);
+    const free = all.filter(p => p.slotMin == null);
+    const stayOf = (opts.schedule && opts.schedule.stayOf) || (() => 45);
+    const start = c.hotel ? { ...c.hotel, isHotel: true } : null;
+    const segs = anchors.map((a, i) => ({ from: i === 0 ? start : anchors[i - 1], to: a, places: [] }));
+    segs.push({ from: anchors[anchors.length - 1], to: null, places: [] });
+    for (const p of free) {
+      let best = 0, bc = Infinity;
+      segs.forEach((sg, i) => {
+        const a = sg.from, b = sg.to; let d;
+        if (!a && !b) d = 0; else if (!a) d = haversine(p, b); else if (!b) d = haversine(a, p); else d = haversine(a, p) + haversine(p, b) - haversine(a, b);
+        // time budget of the segment: over budget costs 80 m per minute, free time earns a bonus so mornings get used
+        let budget = null;
+        if (a && b && a.slotMin != null) budget = b.slotMin - a.slotMin - stayOf(a);
+        else if (b) budget = b.slotMin - ((opts.schedule && opts.schedule.startMin) ?? 570) - (a && !a.slotMin ? 0 : 0);
+        if (budget != null) {
+          const load = sg.places.reduce((t, q) => t + stayOf(q) + 15, 0) + stayOf(p) + 15;
+          if (load > budget) d += (load - budget) * 80; else d -= Math.min(budget - load, 180) * 15;
+        }
+        if (d < bc) { bc = d; best = i; }
+      });
+      segs[best].places.push(p);
+    }
+    const steps = [];
+    segs.forEach((sg, i) => {
+      const sub = { hotel: sg.from, places: sg.places };
+      const r = computeRoute(sub, { ...opts, end: sg.to, schedule: opts.schedule });
+      if (!r) return;
+      r.steps.forEach((st, k) => { if (k === 0 && steps.length) return; steps.push(st); });
+    });
+    const totalDist = steps.reduce((t, x) => t + x.distM, 0), totalTime = steps.reduce((t, x) => t + x.timeMin, 0);
+    return { steps, totalDist, totalTime, startIsHotel: !!c.hotel, anchored: true };
+  }
+
   // ---------- Day schedule: arrival / departure per step ----------
   // opts: { startMin, dow (0 = Monday), stayOf(node) → minutes, hoursOf(node) → parsed hours | null, maxWait }
   function scheduleSteps(steps, opts = {}) {
@@ -287,19 +334,26 @@
         }
         if (!closed) { const c = closesAt(oh, dow, arrive % 1440); if (c != null) closes = dayOff * 1440 + c; }
       }
+      let slotWait = 0, late = 0;
+      if (st.node.slotMin != null) {
+        if (arrive < st.node.slotMin) { slotWait = st.node.slotMin - arrive; arrive = st.node.slotMin; }
+        else if (arrive > st.node.slotMin + 15) late = arrive - st.node.slotMin;
+      }
       const stay = st.node.isHotel ? 0 : stayOf(st.node);
       const depart = arrive + stay;
+      const afterEnd = opts.endMin != null && arrive > opts.endMin;
       totalWait += wait; if (closed) closedCount++;
       clock = depart;
-      return { arrive, depart, wait, closed, opensAt, closes, stay, hasHours: !!oh };
+      return { arrive, depart, wait, closed, opensAt, closes, stay, hasHours: !!oh, slotWait, late, afterEnd };
     });
-    return { items, endMin: clock, totalWait, closedCount };
+    return { items, endMin: clock, totalWait, closedCount, overrun: opts.endMin != null && clock > opts.endMin };
   }
 
   // ---------- "Why this order?" ----------
   function explainStep(steps, k, item) {
     const n = steps[k].node;
     if (k === 0) return n.isHotel ? 'Start: your hotel' : 'Start: the first place you added (no hotel yet)';
+    if (n.slotMin != null) return `${n.slot ? n.slot[0].toUpperCase() + n.slot.slice(1) : 'Fixed'} at ${hhmm(n.slotMin)}${item && item.late ? ` — running ${Math.round(item.late)} min late` : ''}`;
     if (item && item.wait > 0) return `Timed after it opens at ${hhmm(item.opensAt)}`;
     if (item && item.closed) return 'Closed at this time — move it to another day or slot';
     const pr = n.priority ?? 5;
@@ -312,6 +366,6 @@
     mulberry32, haversine, walkEstimate, priorityFactor, routingCost, computeRoute,
     catFromOsm, ROAD, roadClass, buildingHeight, simplify, overpassQuery, OVERPASS_FILTERS,
     decodePolyline, extractCandidates,
-    parseOpeningHours, isOpenAt, nextOpenAt, closesAt, hhmm, scheduleSteps, explainStep,
+    parseOpeningHours, isOpenAt, nextOpenAt, closesAt, hhmm, scheduleSteps, explainStep, computeRouteAnchored,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

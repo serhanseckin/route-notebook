@@ -31,6 +31,10 @@ Live: https://serhanseckin.github.io/route-notebook/
   (filled from OSM when known), day of the trip.
 
 **Planning**
+- Your stay: arrival and departure date-times set the number of days; day 1 starts when you
+  arrive and the last day is cut off when you leave.
+- Meals: pick a breakfast, lunch and dinner place per day (from your list, sorted by priority);
+  they are fixed at their times and the rest of the day is arranged around them.
 - Days: each place belongs to a day; every day has its own route from the hotel.
 - Order = nearest-neighbour + 2-opt on a priority-weighted cost, with a penalty for arriving
   when a place is closed, so lunch spots and museums land in their opening windows.
@@ -38,6 +42,13 @@ Live: https://serhanseckin.github.io/route-notebook/
   one-line reason for every position in the order.
 - Real pedestrian legs from FOSSGIS Valhalla with distance, time and turn-by-turn directions;
   legs over 1.8 km show the nearest metro/tram stations and a transit link.
+
+**Journal (a bit of a game)**
+- Tap any pin for a card with the photo, note, hours and scheduled time.
+- Reaching a place (by location, or ticking ✓) unlocks its journal page: a photo of what you had
+  and a few words. The Journal tab collects the pages by city and day, with badges such as
+  First stop, Foodie, Storyteller, Full day and Three cities.
+- The little walker carries your name; set it by tapping the name next to the title.
 
 **On the road**
 - Live location on the 3D map; the route restarts from where you are and the clock is "now".

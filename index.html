@@ -239,6 +239,55 @@
   .photo-row img{width:56px;height:56px;border-radius:8px;object-fit:cover;border:1.5px solid var(--line)}
   .photo-row input[type=file]{display:none}
   .icon-btn.is-on{color:var(--teal);border-color:var(--teal)}
+  .user-btn{border:0;background:transparent;font-family:var(--font-body);font-size:12px;color:var(--muted);padding:0;margin-left:8px;border-bottom:1px dashed var(--line);cursor:pointer}
+  .user-btn:hover{color:var(--ink)}
+  .trip-card{border:1.5px solid var(--line);border-radius:var(--radius);padding:10px 12px;margin:0 0 12px;background:#fbf8f1}
+  .trip-card.is-unset{border-style:dashed;border-color:var(--ochre);background:#fbf3e2}
+  .trip-card h4{margin:0 0 8px;font-family:var(--font-display);font-weight:600;font-size:15px}
+  .trip-card h4 small{font-family:var(--font-body);font-weight:400;color:var(--ink-2);margin-left:6px}
+  .trip-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--ink-2);margin-top:6px}
+  .trip-row label{display:flex;align-items:center;gap:6px}
+  .trip-row .input{width:auto;padding:4px 8px;font-size:13px}
+  .trip-days{font-family:var(--font-display);font-weight:600;color:var(--ink);font-size:14px}
+  .meal-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 12px}
+  .meal{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2);border:1.5px solid var(--line);border-radius:var(--radius);padding:6px 8px;background:var(--paper)}
+  .meal.is-set{border-color:var(--ochre);background:#fbf3e2}
+  .meal span{font-weight:500;color:var(--ink)}
+  .meal select{width:100%;border:1px solid var(--line);border-radius:4px;background:#fff;padding:4px 6px;font-size:12.5px;color:var(--ink)}
+  .slot-chip{display:inline-block;font-size:11px;font-weight:600;color:var(--accent-ink);background:var(--accent-soft);border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:2px}
+  .times .late,.times .over{color:var(--danger);font-weight:600}
+  .place-card{
+    position:absolute;left:14px;right:14px;bottom:86px;display:flex;gap:10px;align-items:flex-start;
+    background:var(--paper);border:1.5px solid var(--ink);border-radius:8px;box-shadow:3px 3px 0 var(--ink);padding:10px 12px;
+    max-width:460px;margin:0 auto;font-size:13px;
+  }
+  .place-card[hidden]{display:none}
+  .place-card img.pc-photo{width:72px;height:72px;border-radius:8px;object-fit:cover;border:1.5px solid var(--line);flex:none}
+  .place-card .pc-body{flex:1;min-width:0}
+  .place-card .pc-title{font-family:var(--font-display);font-weight:600;font-size:16px;line-height:1.2}
+  .place-card .pc-meta{color:var(--ink-2);font-size:12px;margin-top:2px}
+  .place-card .pc-note{font-family:"Caveat",cursive;font-size:16px;margin-top:4px}
+  .place-card .pc-journal{font-size:12.5px;margin-top:4px;color:var(--ink-2);border-left:3px solid var(--ochre);padding-left:8px}
+  .place-card .pc-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .place-card .pc-actions .btn{padding:4px 9px;font-size:12px}
+  .place-card .pc-actions a.btn{text-decoration:none}
+  .place-card .icon-btn{flex:none;margin:-4px -6px 0 0}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+  .badge{display:flex;flex-direction:column;align-items:center;gap:2px;width:74px;text-align:center;font-size:11px;color:var(--ink-2)}
+  .badge i{font-style:normal;font-size:26px;width:48px;height:48px;border-radius:999px;display:grid;place-items:center;background:#fbf3e2;border:1.5px solid var(--ochre)}
+  .badge.is-locked{opacity:.4;filter:grayscale(1)}
+  .badge.is-locked i{border-style:dashed}
+  .jentry{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:var(--radius);padding:10px 12px;background:#fbf8f1;margin-bottom:8px}
+  .jentry img{width:84px;height:84px;border-radius:8px;object-fit:cover;border:1.5px solid var(--line);flex:none}
+  .jentry .jb{flex:1;min-width:0}
+  .jentry .jn{font-weight:600}
+  .jentry .jm{font-size:12px;color:var(--muted)}
+  .jentry .jt{font-family:"Caveat",cursive;font-size:17px;margin-top:4px;white-space:pre-wrap}
+  .jentry .jt.is-empty{color:var(--muted);font-family:var(--font-body);font-size:12.5px;font-style:italic}
+  .jentry button{border:0;background:transparent;color:var(--teal);text-decoration:underline;padding:0;font-size:12.5px;margin-top:4px}
+  .journal-day{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:16px;margin:16px 0 8px}
+  .unlock{font-size:13px;color:var(--ink-2);margin:0 0 12px}
+  .unlock b{color:var(--accent-ink)}
   .step-note{font-size:12.5px;color:var(--ink-2);font-style:italic;margin-top:2px}
   .hotel-card .note{font-size:12.5px;color:var(--ink-2);font-style:italic}
   .leg .dirs{margin-top:4px}
@@ -277,7 +326,7 @@
     min-height:0;background:var(--paper);
   }
   .panel-tabs{
-    display:grid;grid-template-columns:repeat(4,1fr);
+    display:grid;grid-template-columns:repeat(5,1fr);
     border-bottom:1px solid var(--line);
   }
   .panel-tab{
@@ -534,6 +583,10 @@
     .nav-strip .btn{padding:5px 8px}
     .lbl{font-size:11px;max-width:120px}
     .summary b{font-size:14px}
+    .meal-bar{grid-template-columns:1fr}
+    .place-card{left:8px;right:8px;bottom:64px;padding:8px 10px}
+    .place-card img.pc-photo{width:56px;height:56px}
+    .panel-tab{font-size:12.5px;padding:10px 2px 9px}
     .bulk-head,.bulk-row{grid-template-columns:1fr 1.3fr 48px 26px}
     .veil{align-items:flex-end;padding:0}
     .sheet{width:100%;border-radius:12px 12px 0 0;border-bottom:0;box-shadow:none;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
@@ -543,7 +596,7 @@
 <body>
 <div class="app">
   <header class="topbar">
-    <div class="brand">Route Notebook <small>Barcelona · Milan · Rome</small></div>
+    <div class="brand">Route Notebook <small>Barcelona · Milan · Rome</small><button type="button" class="user-btn" id="user-btn" title="Your name (shown on the walker and the map)">Serhan</button></div>
     <nav class="city-tabs" id="city-tabs"></nav>
   </header>
 
@@ -563,6 +616,21 @@
         </div>
         <div class="map-status" id="map-status"></div>
         <div class="nav-strip" id="nav-strip"></div>
+        <div class="place-card" id="place-card" hidden>
+          <img class="pc-photo" id="pc-photo" alt="" hidden>
+          <div class="pc-body">
+            <div class="pc-title" id="pc-title"></div>
+            <div class="pc-meta" id="pc-meta"></div>
+            <div class="pc-note" id="pc-note"></div>
+            <div class="pc-journal" id="pc-journal" hidden></div>
+            <div class="pc-actions">
+              <button type="button" class="btn btn-ghost" data-pc="edit">✎ Edit</button>
+              <button type="button" class="btn btn-ghost" data-pc="journal">📓 Journal</button>
+              <a class="btn btn-primary" id="pc-dir" target="_blank" rel="noopener">Directions</a>
+            </div>
+          </div>
+          <button type="button" class="icon-btn" id="pc-close" title="Close">×</button>
+        </div>
         <div class="scene-time" id="scene-time" title="Time of day in the scene — follows the schedule when you tap a stop">
           <span>🕘</span><input type="range" id="time-range" min="0" max="1439" step="15" value="570"><b id="time-out">09:30</b><button type="button" class="btn btn-sm btn-ghost" id="time-now" hidden title="Back to the real clock">now</button>
         </div>
@@ -579,6 +647,7 @@
       <nav class="panel-tabs" id="panel-tabs">
         <button class="panel-tab is-active" data-page="route">Route <span class="cnt" id="cnt-places">0</span></button>
         <button class="panel-tab" data-page="add">Add</button>
+        <button class="panel-tab" data-page="journal">Journal</button>
         <button class="panel-tab" data-page="transit">Transit</button>
         <button class="panel-tab" data-page="tickets">Tickets</button>
       </nav>
@@ -588,11 +657,21 @@
         <div class="page is-active" data-page="route">
           <h2 class="sec" id="route-title">Walking route</h2>
           <p class="lead">Starts at the hotel and favours high-priority places. Recalculates itself on every change.</p>
-          <div class="day-bar" id="day-bar"></div>
-          <div class="day-settings">
-            <label>Day 1 date <input type="date" id="trip-date" class="input"></label>
-            <label>Start <input type="time" id="trip-start" class="input" step="300"></label>
+          <div class="trip-card" id="trip-card">
+            <h4>Your stay<small id="trip-days"></small></h4>
+            <div class="trip-row">
+              <label>Arrive <input type="datetime-local" id="trip-arrive" class="input"></label>
+              <label>Leave <input type="datetime-local" id="trip-depart" class="input"></label>
+            </div>
+            <div class="trip-row">
+              <label>Other days start <input type="time" id="trip-start" class="input" step="300"></label>
+              <label title="Breakfast">🥐 <input type="time" id="meal-breakfast" class="input" step="300"></label>
+              <label title="Lunch">🍽️ <input type="time" id="meal-lunch" class="input" step="300"></label>
+              <label title="Dinner">🍷 <input type="time" id="meal-dinner" class="input" step="300"></label>
+            </div>
           </div>
+          <div class="day-bar" id="day-bar"></div>
+          <div class="meal-bar" id="meal-bar"></div>
           <div class="summary" id="route-summary"></div>
           <div id="hotel-card"></div>
           <ol class="steps" id="steps"></ol>
@@ -641,6 +720,14 @@
             <button class="btn btn-primary btn-sm" id="bulk-go">Add all</button>
           </div>
           <p class="note">Lookups use Photon and OpenStreetMap Nominatim; requests are spaced ~1 s apart to respect their usage policy. Rows that cannot be found stay in the table.</p>
+        </div>
+
+        <!-- JOURNAL -->
+        <div class="page" data-page="journal">
+          <h2 class="sec">Travel journal</h2>
+          <p class="lead">Every place you really reach unlocks a page: a photo of what you had and a few words. Badges collect along the way.</p>
+          <div class="badges" id="badges"></div>
+          <div id="journal"></div>
         </div>
 
         <!-- TRANSIT -->
@@ -718,6 +805,43 @@
     </div>
     <div class="sheet-actions">
       <button type="button" class="btn btn-ghost" id="sheet-cancel">Cancel</button>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </form>
+</div>
+
+<!-- Journal entry -->
+<div class="veil" id="journal-veil">
+  <form class="sheet" id="journal-form">
+    <h2 id="j-title">Journal</h2>
+    <p class="unlock" id="j-sub"></p>
+    <div class="field">
+      <label>Photo of what you had</label>
+      <div class="photo-row">
+        <img id="j-photo-img" alt="" hidden>
+        <label class="btn btn-sm btn-ghost" for="j-photo">Choose photo</label>
+        <input type="file" id="j-photo" accept="image/*" capture="environment">
+        <button type="button" class="btn btn-sm btn-ghost" id="j-photo-clear" hidden>Remove</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="j-text">How was it?</label>
+      <textarea class="input" id="j-text" rows="3" placeholder="e.g. the best patatas bravas so far, we sat by the window…"></textarea>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="btn btn-ghost" id="j-later">Later</button>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </form>
+</div>
+
+<!-- Small text prompt -->
+<div class="veil" id="ask-veil">
+  <form class="sheet" id="ask-form">
+    <h2 id="ask-title">Your name</h2>
+    <div class="field"><input class="input" id="ask-input" autocomplete="off"></div>
+    <div class="sheet-actions">
+      <button type="button" class="btn btn-ghost" id="ask-cancel">Cancel</button>
       <button type="submit" class="btn btn-primary">Save</button>
     </div>
   </form>
@@ -844,11 +968,23 @@ const TRANSIT_WARN_M = 1800;
    ===================================================================== */
 const STORAGE_KEY = 'rotaDefteri.v1';
 const todayISO = () => new Date().toISOString().slice(0, 10);
-function emptyCity() { return { hotel: null, places: [], day: 1, days: 1, startMin: 570, date: todayISO() }; }
+const MEAL_DEFAULTS = { breakfast: 540, lunch: 810, dinner: 1230 };
+const MEALS = [['breakfast', '🥐', 'Breakfast'], ['lunch', '🍽️', 'Lunch'], ['dinner', '🍷', 'Dinner']];
+function emptyCity() { return { hotel: null, places: [], day: 1, days: 1, startMin: 570, date: todayISO(), arrive: '', depart: '', meals: { ...MEAL_DEFAULTS } }; }
+const parseDT = str => { if (!str) return null; const d = new Date(str); return isNaN(d) ? null : d; };
+function tripDays(c) {
+  const a = parseDT(c.arrive), b = parseDT(c.depart); if (!a || !b) return null;
+  const d0 = new Date(a); d0.setHours(0, 0, 0, 0); const d1 = new Date(b); d1.setHours(0, 0, 0, 0);
+  return Math.max(1, Math.round((d1 - d0) / 86400000) + 1);
+}
+function dayStartMin(c, d) { const a = parseDT(c.arrive); if (d === 1 && a) return a.getHours() * 60 + a.getMinutes(); return c.startMin ?? 570; }
+function dayEndMin(c, d) { const b = parseDT(c.depart), n = tripDays(c); if (b && n && d === n) return b.getHours() * 60 + b.getMinutes(); return null; }
 function normalizeCity(c) {
-  c.day ||= 1; c.startMin ??= 570; c.date ||= todayISO();
+  c.day ||= 1; c.startMin ??= 570; c.date ||= todayISO(); c.arrive ||= ''; c.depart ||= '';
+  c.meals = { ...MEAL_DEFAULTS, ...(c.meals || {}) };
+  if (parseDT(c.arrive)) c.date = c.arrive.slice(0, 10);
   c.places.forEach(p => { p.day ||= 1; });
-  c.days = Math.max(c.days || 1, c.day, ...c.places.map(p => p.day));
+  c.days = Math.max(tripDays(c) || 1, c.days || 1, c.day, ...c.places.map(p => p.day));
   return c;
 }
 function load() {
@@ -859,13 +995,16 @@ function load() {
     if (!s || !s.cities) return null;
     for (const k of CITY_KEYS) { if (!s.cities[k]) s.cities[k] = emptyCity(); normalizeCity(s.cities[k]); }
     if (!CITIES[s.active]) s.active = CITY_KEYS[0];
+    s.user ||= { name: 'Serhan' };
     return s;
   } catch { return null; }
 }
 const state = load() || {
   active: 'barcelona',
+  user: { name: 'Serhan' },
   cities: Object.fromEntries(CITY_KEYS.map(k => [k, emptyCity()])),
 };
+const userName = () => (state.user && state.user.name) || 'Serhan';
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   catch { toast('Could not save: browser storage may be disabled.'); }
@@ -882,7 +1021,8 @@ const ohCache = new Map();
 const parsedHours = str => { if (!str) return null; if (!ohCache.has(str)) ohCache.set(str, RouteCore.parseOpeningHours(str)); return ohCache.get(str); };
 const stayOf = p => (p.stay > 0 ? +p.stay : CATS[catOf(p)].stay);
 function dayDow(c, day) { const d = new Date((c.date || todayISO()) + 'T12:00:00'); d.setDate(d.getDate() + (day - 1)); return (d.getDay() + 6) % 7; }
-function scheduleOpts(c) { return { startMin: c.startMin ?? 570, dow: dayDow(c, c.day || 1), stayOf, hoursOf: p => parsedHours(p.hours) }; }
+function scheduleOpts(c) { const d = c.day || 1; return { startMin: dayStartMin(c, d), endMin: dayEndMin(c, d), dow: dayDow(c, d), stayOf, hoursOf: p => parsedHours(p.hours) }; }
+const withSlots = (c, places) => places.map(p => ({ ...p, slotMin: p.slot && c.meals && c.meals[p.slot] != null ? c.meals[p.slot] : null }));
 const dayPlacesOf = c => c.places.filter(p => (p.day || 1) === (c.day || 1));
 // While the phone is tracking you, the route starts from where you are and the clock is "now".
 function liveStart() {
@@ -896,8 +1036,8 @@ function scheduleOptsLive(c) {
 }
 function computeRoute(c) {
   const start = liveStart();
-  const sub = { ...c, hotel: start || c.hotel, places: dayPlacesOf(c).filter(p => !p.visited) };
-  const r = RouteCore.computeRoute(sub, {
+  const sub = { ...c, hotel: start || c.hotel, places: withSlots(c, dayPlacesOf(c).filter(p => !p.visited)) };
+  const r = RouteCore.computeRouteAnchored(sub, {
     warnM: TRANSIT_WARN_M,
     legOf: (a, b) => { const l = legCache.get(legKey(a, b)); return l && l.shape ? l : null; },
     schedule: scheduleOptsLive(c),
@@ -1695,7 +1835,7 @@ function rebuildLabels() {
     const obj = pinObjects.get(p.id); if (obj) add(obj, 'is-other', p.visited ? '✓' : 'D' + p.day, CATS[catOf(p)].emoji + ' ' + p.name, p.id);
   }
   if (previewPin) add(previewPin, 'is-preview', '?', 'Preview');
-  if (typeof meGroup !== 'undefined' && meGroup.visible) add(meGroup, 'is-me', '●', 'You are here');
+  if (typeof meGroup !== 'undefined' && meGroup.visible) add(meGroup, 'is-me', '●', userName());
 }
 const _v = new THREE.Vector3();
 function updateLabels() {
@@ -1763,8 +1903,9 @@ canvas.addEventListener('pointerup', e => {
   const hitPin = raycaster.intersectObjects([...pinObjects.values()], true)[0];
   if (hitPin) {
     let g = hitPin.object; while (g && !g.userData.id) g = g.parent;
-    if (g) { selectPlace(g.userData.id); return; }
+    if (g) { selectPlace(g.userData.id); showPlaceCard(g.userData.id); return; }
   }
+  hidePlaceCard();
   const hit = raycaster.intersectObject(ground)[0];
   if (!hit) return;
   const { lat, lon } = unproject(hit.point.x, hit.point.z);
@@ -1888,6 +2029,7 @@ CITY_KEYS.forEach(k => {
 function switchCity(k) {
   if (state.active !== k) { state.active = k; save(); }
   if (typeof walk !== 'undefined' && walk.on) walkStop();
+  if (typeof hidePlaceCard === 'function') hidePlaceCard();
   setPreview(null); selectedId = null;
   document.querySelectorAll('.city-tab').forEach(b => b.classList.toggle('is-active', b.dataset.city === k));
   $('#route-title').textContent = CITIES[k].name + ' — walking route';
@@ -1902,6 +2044,7 @@ function switchCity(k) {
 
 document.querySelectorAll('.panel-tab').forEach(b => b.onclick = () => showPage(b.dataset.page));
 function showPage(p) {
+  if (p === 'journal' && typeof renderJournal === 'function') renderJournal();
   document.querySelectorAll('.panel-tab').forEach(b => b.classList.toggle('is-active', b.dataset.page === p));
   document.querySelectorAll('.page').forEach(pg => pg.classList.toggle('is-active', pg.dataset.page === p));
   $('#panel-body').scrollTop = 0;
@@ -1913,7 +2056,7 @@ function showPage(p) {
    shape, real distance and duration come from here.
    ===================================================================== */
 const VALHALLA = 'https://valhalla1.openstreetmap.de/route';
-const LEG_STORE = 'rotaDefteri.legs.v1';
+const LEG_STORE = 'rotaDefteri.legs.v2'; // v2: English directions
 const legCache = new Map();
 try { for (const [k, v] of Object.entries(JSON.parse(localStorage.getItem(LEG_STORE) || '{}'))) legCache.set(k, v); } catch {}
 function saveLegs() {
@@ -1993,9 +2136,29 @@ function renderDayBar(c) {
   bar.innerHTML = Array.from({ length: c.days || 1 }, (_, i) => i + 1).map(d =>
     `<button type="button" data-day="${d}" class="${d === (c.day || 1) ? 'is-on' : ''}">Day ${d}<span class="cnt">${counts[d] || 0}</span></button>`).join('')
     + `<button type="button" data-day="new" title="Add a day">+ Day</button>`;
-  $('#trip-date').value = c.date || todayISO();
   $('#trip-start').value = hhmm(c.startMin ?? 570);
+  $('#trip-arrive').value = c.arrive || ''; $('#trip-depart').value = c.depart || '';
+  for (const [k] of MEALS) $('#meal-' + k).value = hhmm(c.meals[k]);
+  const n = tripDays(c);
+  $('#trip-days').textContent = n ? `${n} day${n > 1 ? 's' : ''} · ${c.arrive.slice(0, 10)} → ${c.depart.slice(0, 10)}` : 'set arrival and departure to plan the days';
+  $('#trip-card').classList.toggle('is-unset', !n);
+  renderMealBar(c);
 }
+function renderMealBar(c) {
+  const d = c.day || 1;
+  const cands = c.places.filter(p => !p.visited).sort((a, b) => (b.priority || 5) - (a.priority || 5));
+  $('#meal-bar').innerHTML = MEALS.map(([k, e, label]) => {
+    const cur = c.places.find(p => p.slot === k && (p.day || 1) === d);
+    return `<label class="meal ${cur ? 'is-set' : ''}"><span>${e} ${label} <small>${hhmm(c.meals[k])}</small></span><select data-slot="${k}"><option value="">— pick a place —</option>${cands.map(p => `<option value="${p.id}" ${cur && cur.id === p.id ? 'selected' : ''}>${CATS[catOf(p)].emoji} ${esc(p.name)} · P${p.priority || 5}${(p.day || 1) !== d ? ` (Day ${p.day})` : ''}</option>`).join('')}</select></label>`;
+  }).join('');
+}
+$('#meal-bar').addEventListener('change', e => {
+  const sel = e.target.closest('select[data-slot]'); if (!sel) return;
+  const c = city(), d = c.day || 1, k = sel.dataset.slot;
+  c.places.forEach(p => { if (p.slot === k && (p.day || 1) === d) delete p.slot; });
+  if (sel.value) { const p = c.places.find(x => x.id === sel.value); if (p) { p.slot = k; p.day = d; } }
+  save(); rebuildPins(); recompute();
+});
 function renderRoute(route) {
   const c = city();
   renderDayBar(c);
@@ -2037,7 +2200,7 @@ function renderRoute(route) {
   sum.innerHTML = `<div><b>${dayPlaces.length}</b><span>${dayPlaces.length === 1 ? 'place' : 'places'}</span></div>
     <div><b>${approx}${fmtDist(route.totalDist)}</b><span>total distance</span></div>
     <div><b>${approx}${fmtTime(route.totalTime)}</b><span>walking time</span></div>
-    <div><b>${hhmm(sc.endMin)}</b><span>day ends${sc.closedCount ? ` · ${sc.closedCount} closed` : ''}</span></div>`;
+    <div><b>${hhmm(sc.endMin)}</b><span>day ends${sc.overrun ? ' · ⚠ after departure' : ''}${sc.closedCount ? ` · ${sc.closedCount} closed` : ''}</span></div>`;
 
   let k = 0;
   stepsEl.innerHTML = route.steps.map((s, i) => {
@@ -2054,7 +2217,7 @@ function renderRoute(route) {
       const tl = `https://www.google.com/maps/dir/?api=1&origin=${prev.lat},${prev.lon}&destination=${n.lat},${n.lon}&travelmode=transit`;
       transit = `<span class="warn">long leg — ${sa && sb && sa.name !== sb.name ? `${stIcon(sa.type)} ${esc(sa.name)} → ${stIcon(sb.type)} ${esc(sb.name)}` : 'consider public transport'}<a href="${tl}" target="_blank" rel="noopener">transit route</a> <button data-act="go-tickets">tickets</button></span>`;
     }
-    const times = `<div class="times">${hhmm(it.arrive)} – ${hhmm(it.depart)} · stays ${it.stay} min${it.wait ? `<span class="wait"> · waits ${it.wait} min, opens ${hhmm(it.opensAt)}</span>` : ''}${it.closed ? ' · <b class="closed">closed at this time</b>' : ''}${!it.closed && it.closes != null && it.closes - it.arrive < 45 ? ` · <b class="closed">closes ${hhmm(it.closes)}</b>` : ''}${n.hours ? `<span class="hours">⏰ ${esc(n.hours)}</span>` : ''}</div>`;
+    const times = `<div class="times">${hhmm(it.arrive)} – ${hhmm(it.depart)} · stays ${it.stay} min${it.slotWait ? `<span class="wait"> · waits until ${n.slot} at ${hhmm(n.slotMin)}</span>` : ''}${it.late ? `<span class="late"> · ${Math.round(it.late)} min late for ${n.slot}</span>` : ''}${it.afterEnd ? `<span class="over"> · after you leave the city!</span>` : ''}${it.wait ? `<span class="wait"> · waits ${it.wait} min, opens ${hhmm(it.opensAt)}</span>` : ''}${it.closed ? ' · <b class="closed">closed at this time</b>' : ''}${!it.closed && it.closes != null && it.closes - it.arrive < 45 ? ` · <b class="closed">closes ${hhmm(it.closes)}</b>` : ''}${n.hours ? `<span class="hours">⏰ ${esc(n.hours)}</span>` : ''}</div>`;
     const why = `<div class="why">${esc(RouteCore.explainStep(route.steps, i, it))}</div>`;
     const leg = i === 0 ? `<div class="leg"><b>Start</b> — no hotel, so the route starts at the first added place${times}${why}</div>`
       : `<div class="leg">${s.leg ? '' : '~'}${fmtDist(s.distM)} · <b>${fmtTime(s.timeMin)}</b> ${s.leg ? 'walk via streets' : 'straight-line estimate'}<a class="gmaps" href="${gmaps}" target="_blank" rel="noopener">Open in Google Maps</a>${transit}${dirs}${times}${why}</div>`;
@@ -2064,7 +2227,7 @@ function renderRoute(route) {
       <div class="step-row">
         <span class="step-num">${k}</span>
         <div class="step-body">
-          <div class="step-name" data-act="focus"><span class="cat-ico">${CATS[catOf(n)].emoji}</span>${esc(n.name)}</div>${photos[n.id] ? `<img class="step-photo" src="${photos[n.id]}" alt="" style="float:right">` : ''}
+          <div class="step-name" data-act="focus"><span class="cat-ico">${CATS[catOf(n)].emoji}</span>${esc(n.name)}${n.slot ? `<span class="slot-chip">${MEALS.find(m => m[0] === n.slot)?.[1] || ''} ${n.slot}</span>` : ''}</div>${photos[n.id] ? `<img class="step-photo" src="${photos[n.id]}" alt="" style="float:right">` : ''}
           <div class="step-addr"><span class="cat-tag">${CATS[catOf(n)].label}</span> · ${esc(n.address || fmtLatLon(n))}</div>
           ${n.note ? `<div class="step-note">${esc(n.note)}</div>` : ''}
           <div class="step-ctl">
@@ -2086,7 +2249,7 @@ function renderRoute(route) {
 function renderVisitedBox(visited) {
   if (!visited.length) return;
   const box = document.createElement('div'); box.className = 'visited-box'; box.id = 'visited-box';
-  box.innerHTML = `<b>Visited today (${visited.length})</b><ul>${visited.map(p => `<li>${CATS[catOf(p)].emoji} ${esc(p.name)}<button data-act="unvisit" data-id="${p.id}">undo</button></li>`).join('')}</ul>`;
+  box.innerHTML = `<b>Visited today (${visited.length})</b><ul>${visited.map(p => `<li>${CATS[catOf(p)].emoji} ${esc(p.name)}${p.journal && p.journal.text ? ' 📓' : ''}<button data-act="journal" data-id="${p.id}">${p.journal ? 'edit journal' : 'write journal'}</button><button data-act="unvisit" data-id="${p.id}">undo</button></li>`).join('')}</ul>`;
   $('#route-empty').after(box);
 }
 const fmtLatLon = p => `${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}`;
@@ -2106,8 +2269,10 @@ $('#panel-body').addEventListener('click', async e => {
     return;
   }
   if (act === 'unvisit') { const q = c.places.find(x => x.id === btn.dataset.id); if (q) { q.visited = false; save(); rebuildPins(); recompute(); } return; }
+  if (act === 'journal') { const q = c.places.find(x => x.id === btn.dataset.id); if (q) openJournal(q, false); return; }
+  if (act === 'jedit') { for (const k of CITY_KEYS) { const q = state.cities[k].places.find(x => x.id === btn.dataset.id); if (q) { openJournal(q, false); break; } } return; }
   const p = c.places.find(x => x.id === id); if (!p) return;
-  if (act === 'visit') { p.visited = true; save(); rebuildPins(); recompute(); toast(`${p.name} marked as visited.`); return; }
+  if (act === 'visit') { markVisited(p, false); return; }
   if (act === 'inc' || act === 'dec') {
     const v = Math.max(1, Math.min(10, p.priority + (act === 'inc' ? 1 : -1)));
     if (v !== p.priority) { p.priority = v; save(); recompute(); }
@@ -2118,7 +2283,7 @@ $('#panel-body').addEventListener('click', async e => {
       save(); rebuildPins(); recompute(); toast('Deleted.');
     }
   } else if (act === 'focus') {
-    selectPlace(id, true);
+    selectPlace(id, true); showPlaceCard(id);
     const k = currentRoute?.steps.findIndex(st => st.node.id === id);
     if (k >= 0 && currentRoute.sched) setManualTime(currentRoute.sched.items[k].arrive);
   } else if (act === 'edit') {
@@ -2133,7 +2298,9 @@ $('#day-bar').addEventListener('click', e => {
   else c.day = +b.dataset.day;
   save(); rebuildPins(); recompute(); fitAll();
 });
-$('#trip-date').addEventListener('change', e => { city().date = e.target.value || todayISO(); save(); recompute(); });
+$('#trip-arrive').addEventListener('change', e => { const c = city(); c.arrive = e.target.value || ''; normalizeCity(c); if (c.day > c.days) c.day = 1; save(); rebuildPins(); recompute(); });
+$('#trip-depart').addEventListener('change', e => { const c = city(); c.depart = e.target.value || ''; normalizeCity(c); if (c.day > c.days) c.day = 1; save(); rebuildPins(); recompute(); });
+for (const [k] of MEALS) $('#meal-' + k).addEventListener('change', e => { const [h, m] = (e.target.value || hhmm(MEAL_DEFAULTS[k])).split(':').map(Number); city().meals[k] = h * 60 + m; save(); recompute(); });
 $('#trip-start').addEventListener('change', e => { const [h, m] = (e.target.value || '09:30').split(':').map(Number); city().startMin = h * 60 + m; save(); recompute(); });
 $('#clear-city').onclick = async () => {
   const c = city();
@@ -2150,7 +2317,7 @@ async function offlinePack() {
   try {
     const days = c.days || 1; const pts = [];
     for (let d = 1; d <= days; d++) {
-      const r = RouteCore.computeRoute({ ...c, day: d, places: c.places.filter(p => (p.day || 1) === d && !p.visited) }, { warnM: TRANSIT_WARN_M, legOf: (a, b) => { const l = legCache.get(legKey(a, b)); return l && l.shape ? l : null; }, schedule: { ...scheduleOpts(c), dow: dayDow(c, d) } });
+      const r = RouteCore.computeRouteAnchored({ ...c, day: d, places: withSlots(c, c.places.filter(p => (p.day || 1) === d && !p.visited)) }, { warnM: TRANSIT_WARN_M, legOf: (a, b) => { const l = legCache.get(legKey(a, b)); return l && l.shape ? l : null; }, schedule: { ...scheduleOpts(c), dow: dayDow(c, d) } });
       if (!r) continue;
       for (let k = 1; k < r.steps.length; k++) {
         const a = r.steps[k - 1].node, b = r.steps[k].node, key = legKey(a, b);
@@ -2361,26 +2528,41 @@ function walkStart() {
   if (!currentRoute || currentRoute.steps.length < 2) return toast('Add at least two stops to walk the route.');
   Object.assign(walk, buildWalkPath(currentRoute), { on: true, pos: 0, pauseUntil: 0, stopIdx: -1, follow: true });
   walker.visible = true; walker.position.copy(walk.path[0]);
+  walkerName(true);
   $('#walk-btn').classList.add('is-on'); $('#walk-btn').textContent = '■ Stop';
   flyTo(walk.path[0], 90);
   setSceneTime(currentRoute.sched.items[0].arrive);
 }
 function walkStop() {
-  walk.on = false; walker.visible = false; walkBubble(null);
+  walk.on = false; walker.visible = false; walkBubble(null); walkerName(false);
   if (!timeManual) setSceneTime(nowMin());
   $('#walk-btn').classList.remove('is-on'); $('#walk-btn').textContent = '▶ Walk';
 }
 $('#walk-btn').onclick = () => walk.on ? walkStop() : walkStart();
-let bubbleEl = null;
+let bubbleEl = null, walkerNameEl = null;
+function walkerName(show) {
+  if (walkerNameEl) { walkerNameEl.remove(); walkerNameEl = null; labelEntries = labelEntries.filter(e => e.el !== walkerNameEl); }
+  labelEntries = labelEntries.filter(e => e.obj !== walker || e.el === bubbleEl);
+  if (!show) return;
+  walkerNameEl = document.createElement('div');
+  walkerNameEl.className = 'lbl is-me';
+  walkerNameEl.innerHTML = `<span class="n">🚶</span><span class="t">${esc(userName())}</span>`;
+  labelsEl.appendChild(walkerNameEl);
+  labelEntries.push({ el: walkerNameEl, obj: walker });
+}
 function walkBubble(step) {
-  if (bubbleEl) { bubbleEl.remove(); bubbleEl = null; labelEntries = labelEntries.filter(e => e.obj !== walker); }
-  if (!step) return;
+  if (bubbleEl) { bubbleEl.remove(); labelEntries = labelEntries.filter(e => e.el !== bubbleEl); bubbleEl = null; }
+  if (!step) { walkerName(walk.on); return; }
   const n = step.node;
+  walkerName(false);
   bubbleEl = document.createElement('div');
   bubbleEl.className = 'lbl is-bubble';
-  bubbleEl.innerHTML = `<span class="n">${n.isHotel ? 'H' : esc(String(step.k))}</span><span class="t">${esc(n.name)}${n.note ? `<small>${esc(n.note)}</small>` : ''}</span>`;
+  const head = n.isHotel || n.isLive ? `${esc(userName())} sets off from ${esc(n.name)}` : `${esc(userName())} · ${esc(n.name)}`;
+  bubbleEl.innerHTML = `<span class="n">${n.isHotel || n.isLive ? '🚶' : esc(String(step.k))}</span><span class="t">${head}${n.note ? `<small>${esc(n.note)}</small>` : ''}</span>`;
   labelsEl.appendChild(bubbleEl);
   labelEntries.push({ el: bubbleEl, obj: walker });
+  clearTimeout(walk.bubbleTimer);
+  walk.bubbleTimer = setTimeout(() => { if (walk.on && bubbleEl) { bubbleEl.remove(); labelEntries = labelEntries.filter(e => e.el !== bubbleEl); bubbleEl = null; walkerName(true); } }, 2600);
 }
 function walkTick(dt, now) {
   if (!walk.on) return;
@@ -2450,7 +2632,7 @@ function liveChecks() {
   for (const p of dayPlacesOf(c)) {
     if (p.visited) continue;
     const d = haversine(mePos, p);
-    if (d < 40) { if (!nearSince.has(p.id)) nearSince.set(p.id, now); else if (now - nearSince.get(p.id) > 5 * 60000) { p.visited = true; nearSince.delete(p.id); save(); rebuildPins(); recompute(); notify('Visited', `${p.name} marked as visited — route updated.`); } }
+    if (d < 40) { if (!nearSince.has(p.id)) nearSince.set(p.id, now); else if (now - nearSince.get(p.id) > 5 * 60000) { nearSince.delete(p.id); markVisited(p, true); } }
     else nearSince.delete(p.id);
   }
   // approaching the next stop
@@ -2514,6 +2696,112 @@ function updateNav() {
     <a class="btn btn-sm btn-primary" href="${gm}" target="_blank" rel="noopener">Directions</a>`;
   strip.classList.add('is-on');
   $('#follow-btn').onclick = () => { follow = !follow; $('#follow-btn').classList.toggle('is-on', follow); if (follow) flyTo(meGroup.position, Math.min(220, camera.position.distanceTo(controls.target))); };
+}
+
+/* =====================================================================
+   Your name, place card, visits and the travel journal
+   ===================================================================== */
+function askText(title, value) {
+  return new Promise(resolve => {
+    $('#ask-title').textContent = title; $('#ask-input').value = value || '';
+    const veil = $('#ask-veil'); veil.classList.add('is-open'); setTimeout(() => $('#ask-input').focus(), 50);
+    const done = v => { veil.classList.remove('is-open'); $('#ask-form').onsubmit = null; $('#ask-cancel').onclick = null; resolve(v); };
+    $('#ask-form').onsubmit = e => { e.preventDefault(); done($('#ask-input').value.trim()); };
+    $('#ask-cancel').onclick = () => done(null);
+  });
+}
+function renderUser() { $('#user-btn').textContent = userName(); }
+$('#user-btn').onclick = async () => { const v = await askText('Your name', userName()); if (v) { state.user = { name: v }; save(); renderUser(); rebuildLabels(); toast(`Hello, ${v}!`); } };
+renderUser();
+
+// ---- Place card (tap a pin) ----
+let cardId = null;
+function showPlaceCard(id) {
+  const c = city();
+  const p = c.places.find(x => x.id === id) || (c.hotel && c.hotel.id === id ? c.hotel : null);
+  if (!p) return;
+  cardId = id;
+  const isHotel = c.hotel && c.hotel.id === id;
+  const photo = photos[id] || photos['j:' + id];
+  const img = $('#pc-photo'); img.hidden = !photo; if (photo) img.src = photo;
+  $('#pc-title').innerHTML = `${isHotel ? '🏨' : CATS[catOf(p)].emoji} ${esc(p.name)}${p.slot ? `<span class="slot-chip">${p.slot}</span>` : ''}`;
+  const k = currentRoute ? currentRoute.steps.findIndex(st => st.node.id === id) : -1;
+  const it = k >= 0 && currentRoute.sched ? currentRoute.sched.items[k] : null;
+  const meta = [isHotel ? 'Hotel' : `${CATS[catOf(p)].label} · Day ${p.day || 1}`, it ? `${hhmm(it.arrive)} – ${hhmm(it.depart)}` : (p.visited ? '✓ visited' : ''), p.hours ? `⏰ ${p.hours}` : ''].filter(Boolean).join(' · ');
+  $('#pc-meta').textContent = meta;
+  $('#pc-note').textContent = p.note || ''; $('#pc-note').hidden = !p.note;
+  const j = $('#pc-journal');
+  if (p.journal && (p.journal.text || photos['j:' + id])) { j.hidden = false; j.textContent = `📓 ${p.journal.text || '(photo only)'}${p.visitedAt ? ` — ${new Date(p.visitedAt).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}` : ''}`; }
+  else j.hidden = true;
+  $('#pc-dir').href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}&travelmode=walking`;
+  $('#place-card').querySelector('[data-pc="journal"]').hidden = isHotel;
+  $('#place-card').hidden = false;
+}
+function hidePlaceCard() { $('#place-card').hidden = true; cardId = null; }
+$('#pc-close').onclick = hidePlaceCard;
+$('#place-card').addEventListener('click', e => {
+  const b = e.target.closest('[data-pc]'); if (!b || !cardId) return;
+  const c = city();
+  if (b.dataset.pc === 'edit') { if (c.hotel && c.hotel.id === cardId) openSheet(c.hotel, c.hotel.name, { edit: c.hotel, hotel: true }); else { const p = c.places.find(x => x.id === cardId); if (p) openSheet(p, p.name, { edit: p }); } }
+  if (b.dataset.pc === 'journal') { const p = c.places.find(x => x.id === cardId); if (p) openJournal(p, false); }
+});
+
+// ---- Visits unlock a journal page ----
+function markVisited(p, auto) {
+  p.visited = true; p.visitedAt = p.visitedAt || new Date().toISOString();
+  save(); rebuildPins(); recompute();
+  if (auto) notify('Unlocked', `${p.name} — you made it! Add a photo of what you had.`);
+  openJournal(p, true);
+}
+let journalPlace = null, journalPhoto = null;
+function showJournalPhoto() { const im = $('#j-photo-img'); im.hidden = !journalPhoto; if (journalPhoto) im.src = journalPhoto; $('#j-photo-clear').hidden = !journalPhoto; }
+function openJournal(p, unlocked) {
+  journalPlace = p; journalPhoto = photos['j:' + p.id] || null; showJournalPhoto();
+  $('#j-title').textContent = unlocked ? `🏅 ${p.name} unlocked!` : `📓 ${p.name}`;
+  $('#j-sub').innerHTML = unlocked ? `<b>${esc(userName())}</b>, you really made it here. What did you have, and how was it?` : `Your page for ${esc(p.name)}${p.visitedAt ? ` · visited ${new Date(p.visitedAt).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}` : ''}.`;
+  $('#j-text').value = (p.journal && p.journal.text) || '';
+  $('#journal-veil').classList.add('is-open');
+}
+function closeJournal() { $('#journal-veil').classList.remove('is-open'); journalPlace = null; }
+$('#j-later').onclick = closeJournal;
+$('#journal-veil').addEventListener('click', e => { if (e.target === $('#journal-veil')) closeJournal(); });
+$('#j-photo').addEventListener('change', async e => { const f = e.target.files[0]; if (!f) return; try { journalPhoto = await resizeImage(f, 360); showJournalPhoto(); } catch { toast('Could not read that image.'); } e.target.value = ''; });
+$('#j-photo-clear').onclick = () => { journalPhoto = null; showJournalPhoto(); };
+$('#journal-form').addEventListener('submit', e => {
+  e.preventDefault(); if (!journalPlace) return;
+  const p = journalPlace;
+  p.journal = { text: $('#j-text').value.trim(), at: new Date().toISOString() };
+  if (journalPhoto) photos['j:' + p.id] = journalPhoto; else delete photos['j:' + p.id];
+  savePhotos(); save(); closeJournal(); recompute(); renderJournal();
+  if (cardId === p.id) showPlaceCard(p.id);
+  toast('Journal page saved.');
+});
+
+// ---- Journal page + badges ----
+const BADGES = [
+  ['first', '🥾', 'First stop', v => v.length >= 1],
+  ['five', '🧭', 'Explorer', v => v.length >= 5],
+  ['foodie', '🍴', 'Foodie', v => v.filter(p => ['restaurant', 'cafe', 'bar'].includes(catOf(p))).length >= 3],
+  ['story', '✍️', 'Storyteller', v => v.filter(p => p.journal && p.journal.text).length >= 3],
+  ['shots', '📷', 'Photographer', v => v.filter(p => photos['j:' + p.id]).length >= 3],
+  ['day', '🌇', 'Full day', () => CITY_KEYS.some(k => { const c = state.cities[k]; for (let d = 1; d <= (c.days || 1); d++) { const ps = c.places.filter(p => (p.day || 1) === d); if (ps.length >= 2 && ps.every(p => p.visited)) return true; } return false; })],
+  ['tri', '🗺️', 'Three cities', () => CITY_KEYS.every(k => state.cities[k].places.some(p => p.visited))],
+  ['early', '🌅', 'Early bird', v => v.some(p => { if (!p.visitedAt) return false; const h = new Date(p.visitedAt).getHours(); return h >= 5 && h < 9; })],
+  ['owl', '🦉', 'Night owl', v => v.some(p => p.visitedAt && new Date(p.visitedAt).getHours() >= 22)],
+];
+function renderJournal() {
+  const all = []; for (const k of CITY_KEYS) for (const p of state.cities[k].places) if (p.visited) all.push({ ...p, cityKey: k });
+  $('#badges').innerHTML = BADGES.map(([id, e, label, test]) => { const ok = !!test(all); return `<div class="badge ${ok ? '' : 'is-locked'}" title="${ok ? 'Unlocked' : 'Locked'}"><i>${e}</i>${label}</div>`; }).join('');
+  const box = $('#journal');
+  if (!all.length) { box.innerHTML = `<div class="empty"><b>No pages yet</b>Reach a place on your list (or tick ✓) and its page unlocks here.</div>`; return; }
+  all.sort((a, b) => (a.visitedAt || '').localeCompare(b.visitedAt || ''));
+  const groups = new Map();
+  for (const p of all) { const key = `${CITIES[p.cityKey].name} · Day ${p.day || 1}`; if (!groups.has(key)) groups.set(key, []); groups.get(key).push(p); }
+  box.innerHTML = [...groups.entries()].map(([g, ps]) => `<div class="journal-day">${esc(g)}</div>` + ps.map(p => {
+    const ph = photos['j:' + p.id] || photos[p.id];
+    const when = p.visitedAt ? new Date(p.visitedAt).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' }) : '';
+    return `<div class="jentry">${ph ? `<img src="${ph}" alt="">` : ''}<div class="jb"><div class="jn">${CATS[catOf(p)].emoji} ${esc(p.name)}</div><div class="jm">${esc(when)}${p.note ? ` · ${esc(p.note)}` : ''}</div><div class="jt ${p.journal && p.journal.text ? '' : 'is-empty'}">${p.journal && p.journal.text ? esc(p.journal.text) : 'No words yet — tap edit to write about it.'}</div><button data-act="jedit" data-id="${p.id}">${p.journal ? 'edit' : 'write'}</button></div></div>`;
+  }).join('')).join('');
 }
 
 /* =====================================================================
