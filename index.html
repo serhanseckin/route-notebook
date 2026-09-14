@@ -153,6 +153,7 @@
   }
   .scene-time b{font-family:var(--font-display);font-size:14px;color:var(--ink);min-width:44px;text-align:center}
   .scene-time input[type=range]{width:120px;accent-color:var(--accent);height:18px}
+  .scene-time .btn{padding:2px 8px;font-size:11px;box-shadow:none}
   .walk-ctl{display:flex;gap:6px;align-items:center}
   .scene-ui > *{pointer-events:auto}
   .scene-hint{
@@ -173,6 +174,7 @@
   }
   .scene-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
   .scene-tools{position:absolute;right:14px;top:12px;display:flex;gap:6px}
+  .scene-tools .btn-ghost{background:rgba(244,238,226,.88);border-color:var(--line)}
   .scene-status{
     position:absolute;left:50%;top:12px;transform:translateX(-50%);
     font-size:12.5px;padding:6px 12px;
@@ -551,7 +553,7 @@
       <div class="scene-fx"></div>
       <div class="labels" id="labels"></div>
       <div class="scene-ui">
-        <div class="scene-hint"><b>Tap</b> the ground → add a place · drag → rotate · scroll/pinch → zoom</div>
+        <div class="scene-hint"><b>Tap</b> the ground → add a place · drag → rotate · scroll/pinch → zoom · pan → the map fills in as you explore</div>
         <div class="scene-status" id="scene-status"></div>
         <div class="scene-tools">
           <button class="btn btn-sm btn-ghost" id="walk-btn" title="Walk the route with a little figure">▶ Walk</button>
@@ -562,7 +564,7 @@
         <div class="map-status" id="map-status"></div>
         <div class="nav-strip" id="nav-strip"></div>
         <div class="scene-time" id="scene-time" title="Time of day in the scene — follows the schedule when you tap a stop">
-          <span>🕘</span><input type="range" id="time-range" min="0" max="1439" step="15" value="570"><b id="time-out">09:30</b>
+          <span>🕘</span><input type="range" id="time-range" min="0" max="1439" step="15" value="570"><b id="time-out">09:30</b><button type="button" class="btn btn-sm btn-ghost" id="time-now" hidden title="Back to the real clock">now</button>
         </div>
         <div class="attrib">Map data © OpenStreetMap contributors</div>
         <div class="scene-legend">
@@ -1015,18 +1017,28 @@ function setSceneTime(min) {
   const dir = new THREE.Vector3(-Math.cos(az) * Math.cos(elev), Math.max(0.12, Math.sin(elev)), 0.45 * Math.cos(elev)).normalize();
   sunOffset.copy(dir.multiplyScalar(D));
   sun.color.copy(tmpC.setHex(0xfff3df).lerp(new THREE.Color(0xffb26a), dusk)).lerp(new THREE.Color(0x9fb4ff), sceneNight > 0.9 ? 1 : 0);
-  sun.intensity = 0.15 + 1.75 * day;
+  sun.intensity = 0.25 + 1.65 * day;
   hemi.color.copy(tmpC.setHex(0xfff6e4).lerp(new THREE.Color(0x6f7fb0), sceneNight));
   hemi.groundColor.copy(tmpC.setHex(0xbfae8a).lerp(new THREE.Color(0x2d3350), sceneNight));
-  hemi.intensity = 0.35 + 0.7 * day;
+  hemi.intensity = 0.55 + 0.5 * day;
   const bg = tmpC.copy(DAY_BG).lerp(DUSK_BG, dusk).lerp(NIGHT_BG, sceneNight);
   scene.background.copy(bg); scene.fog.color.copy(bg);
   routeGroup.traverse(o => { if (o.material?.emissive) { o.material.emissive.setHex(COLORS.route); o.material.emissiveIntensity = 0.55 * sceneNight; } });
   pinGroup.traverse(o => { if (o.material?.emissive && o.material.color) { o.material.emissive.copy(o.material.color); o.material.emissiveIntensity = 0.35 * sceneNight; } });
+  // street lamps switch on at dusk
+  const lampOn = Math.min(1, Math.max(0, (0.55 - day) / 0.4));
+  matBulb.emissiveIntensity = 3.2 * lampOn; matGlow.opacity = 0.34 * lampOn; matGlow.visible = lampOn > 0.02;
   $('#time-out').textContent = hhmm(sceneMin);
   $('#time-range').value = sceneMin;
 }
-$('#time-range').addEventListener('input', e => setSceneTime(+e.target.value));
+// The scene follows the real clock unless you scrub the slider or tap a stop; "now" returns to it.
+let timeManual = false;
+const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+function setManualTime(min) { timeManual = true; $('#time-now').hidden = false; setSceneTime(min); }
+function followRealTime() { timeManual = false; $('#time-now').hidden = true; setSceneTime(nowMin()); }
+$('#time-range').addEventListener('input', e => setManualTime(+e.target.value));
+$('#time-now').onclick = followRealTime;
+setInterval(() => { if (!timeManual && !(typeof walk !== 'undefined' && walk.on)) setSceneTime(nowMin()); }, 30000);
 
 let env = null, ground = null, terrainH = () => 0, flatRadius = 1100;
 const pinGroup = new THREE.Group(); scene.add(pinGroup);
@@ -1079,7 +1091,7 @@ function buildEnvironment() {
 const CELL = 80;           // 1 cell = 80 units = 800 m; the grid is offset by half a cell so the city centre sits in the middle of cell 0:0
 const CELL_REACH = 70;     // ±700 m loaded around every place
 const CENTER_REACH = 79;   // ±790 m around the city centre → the 9 cells shipped in data/map-*.json
-const MAX_CELLS = 80;
+const MAX_CELLS = 160;
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
 let overpassCursor = 0;
 const CACHE_VER = 'v4';
@@ -1118,10 +1130,10 @@ function mapPoints() {
   const c = city();
   return [cityDef().center, ...(c.hotel ? [c.hotel] : []), ...c.places, ...(typeof mePos !== 'undefined' && mePos ? [mePos] : [])];
 }
-let extraMapPoints = [];
+let extraMapPoints = [], viewPoint = null;
 function neededCells() {
   const set = new Map();
-  mapPoints().concat(extraMapPoints).forEach((p, idx) => {
+  mapPoints().concat(extraMapPoints, viewPoint ? [viewPoint] : []).forEach((p, idx) => {
     const q = project(p.lat, p.lon);
     const R = idx === 0 ? CENTER_REACH : CELL_REACH;
     const cx0 = Math.floor((q.x - R + CELL / 2) / CELL), cx1 = Math.floor((q.x + R + CELL / 2) / CELL);
@@ -1168,6 +1180,7 @@ async function ensureMap(force = false) {
   const cityKey = state.active;
   const cells = mapCells[cityKey];
   try {
+    if (force) { cells.clear(); resetMapBuild(cityKey); bundleLoaded.delete(cityKey); }
     // 0) static bundle shipped with the app (city centre, instant)
     await loadBundle(cityKey);
     const need = neededCells();
@@ -1222,6 +1235,39 @@ const matRoad = new THREE.MeshStandardMaterial({ color: COLORS.road, flatShading
 const matWater = new THREE.MeshStandardMaterial({ color: COLORS.water, flatShading: true, roughness: 0.6, side: THREE.DoubleSide });
 const matGreen = new THREE.MeshStandardMaterial({ color: COLORS.green, flatShading: true, roughness: 1, side: THREE.DoubleSide });
 const matSand = new THREE.MeshStandardMaterial({ color: COLORS.sand, flatShading: true, roughness: 1, side: THREE.DoubleSide });
+const matPost = new THREE.MeshStandardMaterial({ color: 0x5a544c, flatShading: true, roughness: 0.9 });
+const matBulb = new THREE.MeshStandardMaterial({ color: 0xfff1c8, emissive: 0xffc46b, emissiveIntensity: 0, flatShading: true });
+const matGlow = new THREE.MeshBasicMaterial({ color: 0xffb85c, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+matGlow.visible = false;
+const postGeo = new THREE.CylinderGeometry(0.09, 0.13, 0.9, 5), bulbGeo = new THREE.SphereGeometry(0.2, 5, 4), glowGeo = new THREE.CircleGeometry(2.6, 10);
+glowGeo.rotateX(-Math.PI / 2);
+const LAMP_CLASSES = new Set(['primary', 'secondary', 'tertiary', 'residential', 'unclassified', 'living_street', 'pedestrian']);
+function lampPositions(r, out) { // one lamp every ~90 m, alternating sides of the road
+  if (!LAMP_CLASSES.has(r.c)) return;
+  const w = ROAD[r.c][0] / 2 + 0.3, P = r.p; let acc = 0, next = 4.5, side = 1;
+  for (let i = 0; i < P.length - 1; i++) {
+    const [ax, az] = P[i], [bx, bz] = P[i + 1]; const len = Math.hypot(bx - ax, bz - az); if (len < 0.01) continue;
+    const nx = -(bz - az) / len, nz = (bx - ax) / len;
+    while (next <= acc + len) {
+      const t = (next - acc) / len; out.push([ax + (bx - ax) * t + nx * w * side, az + (bz - az) * t + nz * w * side]);
+      next += 9; side = -side;
+    }
+    acc += len;
+  }
+}
+function lampMeshes(pts) {
+  const n = Math.min(pts.length, 700); if (!n) return [];
+  const posts = new THREE.InstancedMesh(postGeo, matPost, n), bulbs = new THREE.InstancedMesh(bulbGeo, matBulb, n), glows = new THREE.InstancedMesh(glowGeo, matGlow, n);
+  const m = new THREE.Matrix4();
+  for (let i = 0; i < n; i++) {
+    const [x, z] = pts[i], y = terrainH(x, z);
+    posts.setMatrixAt(i, m.makeTranslation(x, y + 0.45, z));
+    bulbs.setMatrixAt(i, m.makeTranslation(x, y + 0.95, z));
+    glows.setMatrixAt(i, m.makeTranslation(x, y + 0.07, z));
+  }
+  posts.castShadow = false; glows.renderOrder = 2;
+  return [posts, bulbs, glows];
+}
 
 function triangulate(pts) { // [[x,z],...] -> triangle index list
   const contour = pts.map(p => new THREE.Vector2(p[0], p[1]));
@@ -1347,30 +1393,52 @@ function nearLandmark(cityKey, el) {
   return false;
 }
 let mapStats = { buildings: 0, roads: 0 };
-function rebuildMap() {
-  mapGroup.traverse(o => o.geometry?.dispose());
-  mapGroup.clear();
-  const seen = new Set();
-  const bPos = [], bCol = [], rPos = [], wPos = [], gPos = [], sPos = [];
-  stations = [];
-  let nb = 0, nr = 0;
-  for (const els of mapCells[state.active].values()) for (const el of els) {
+const builtCells = new Map(); // cityKey -> Map(cellKey -> Group)
+const drawnIds = new Map();   // cityKey -> Set of element ids already drawn (cells overlap at their borders)
+function resetMapBuild(cityKey) {
+  const built = builtCells.get(cityKey);
+  if (built) for (const g of built.values()) g.traverse(o => o.geometry?.dispose());
+  builtCells.delete(cityKey); drawnIds.delete(cityKey);
+  if (mapGroup.userData.city === cityKey) mapGroup.userData.city = null;
+}
+function buildCellGroup(cityKey, els, seen) {
+  const g = new THREE.Group();
+  const bPos = [], bCol = [], rPos = [], wPos = [], gPos = [], sPos = [], lamps = [];
+  for (const el of els) {
     if (seen.has(el.id)) continue; seen.add(el.id);
-    if (el.k === 'b') { if (nearLandmark(state.active, el)) continue; pushBuilding(bPos, bCol, el); nb++; }
-    else if (el.k === 'r') { pushRoad(rPos, el); nr++; }
+    if (el.k === 'b') { if (nearLandmark(cityKey, el)) continue; pushBuilding(bPos, bCol, el); mapStats.buildings++; }
+    else if (el.k === 'r') { pushRoad(rPos, el); lampPositions(el, lamps); mapStats.roads++; }
     else if (el.k === 'w') pushFlatPolygon(wPos, el.p, 0.05);
     else if (el.k === 'wl') pushRoad(wPos, el, [el.w, 0.06]);
     else if (el.k === 'g') pushFlatPolygon(gPos, el.p, 0.03);
     else if (el.k === 's') pushFlatPolygon(sPos, el.p, 0.03);
-    else if (el.k === 'st') stations.push({ name: el.n, type: el.t, lat: el.ll[0], lon: el.ll[1], x: el.p[0], z: el.p[1] });
   }
-  const mb = makeMesh(bPos, matBuilding, bCol); if (mb) { mb.castShadow = true; mb.receiveShadow = true; mapGroup.add(mb); }
-  const mr = makeMesh(rPos, matRoad); if (mr) { mr.receiveShadow = true; mapGroup.add(mr); }
-  const mw = makeMesh(wPos, matWater); if (mw) mapGroup.add(mw);
-  const mg = makeMesh(gPos, matGreen); if (mg) { mg.receiveShadow = true; mapGroup.add(mg); }
-  const ms = makeMesh(sPos, matSand); if (ms) { ms.receiveShadow = true; mapGroup.add(ms); }
-  mapGroup.add(buildLandmarks(state.active));
-  mapStats = { buildings: nb, roads: nr };
+  const mb = makeMesh(bPos, matBuilding, bCol); if (mb) { mb.castShadow = true; mb.receiveShadow = true; g.add(mb); }
+  const mr = makeMesh(rPos, matRoad); if (mr) { mr.receiveShadow = true; g.add(mr); }
+  const mw = makeMesh(wPos, matWater); if (mw) g.add(mw);
+  const mg = makeMesh(gPos, matGreen); if (mg) { mg.receiveShadow = true; g.add(mg); }
+  const ms = makeMesh(sPos, matSand); if (ms) { ms.receiveShadow = true; g.add(ms); }
+  for (const lm of lampMeshes(lamps)) g.add(lm);
+  return g;
+}
+// Adds meshes only for cells that are new; switching city swaps the whole set (kept in memory per city).
+function rebuildMap() {
+  const cityKey = state.active;
+  if (!builtCells.has(cityKey)) { builtCells.set(cityKey, new Map()); drawnIds.set(cityKey, new Set()); }
+  const built = builtCells.get(cityKey), seen = drawnIds.get(cityKey);
+  if (mapGroup.userData.city !== cityKey) {
+    mapGroup.clear(); mapGroup.userData.city = cityKey;
+    for (const g of built.values()) mapGroup.add(g);
+    mapGroup.add(buildLandmarks(cityKey));
+  }
+  for (const [key, els] of mapCells[cityKey]) {
+    if (built.has(key)) continue;
+    const g = buildCellGroup(cityKey, els, seen);
+    built.set(key, g); mapGroup.add(g);
+  }
+  stations = [];
+  const stSeen = new Set();
+  for (const els of mapCells[cityKey].values()) for (const el of els) if (el.k === 'st' && !stSeen.has(el.id)) { stSeen.add(el.id); stations.push({ name: el.n, type: el.t, lat: el.ll[0], lon: el.ll[1], x: el.p[0], z: el.p[1] }); }
 }
 
 // ---- Pins ----
@@ -1723,7 +1791,7 @@ function animate(now) {
     const k = Math.min(1, (now - camTween.s) / camTween.d), e = 1 - Math.pow(1 - k, 3);
     camera.position.lerpVectors(camTween.p0, camTween.p1, e);
     controls.target.lerpVectors(camTween.t0, camTween.t1, e);
-    if (k >= 1) camTween = null;
+    if (k >= 1) { camTween = null; if (typeof scheduleViewLoad === 'function') scheduleViewLoad(); }
   }
   for (let i = fades.length - 1; i >= 0; i--) {
     const f = fades[i]; const k = Math.min(1, (now - f.t0) / f.dur);
@@ -2052,7 +2120,7 @@ $('#panel-body').addEventListener('click', async e => {
   } else if (act === 'focus') {
     selectPlace(id, true);
     const k = currentRoute?.steps.findIndex(st => st.node.id === id);
-    if (k >= 0 && currentRoute.sched) setSceneTime(currentRoute.sched.items[k].arrive);
+    if (k >= 0 && currentRoute.sched) setManualTime(currentRoute.sched.items[k].arrive);
   } else if (act === 'edit') {
     openSheet(p, p.name, { edit: p });
   }
@@ -2066,7 +2134,7 @@ $('#day-bar').addEventListener('click', e => {
   save(); rebuildPins(); recompute(); fitAll();
 });
 $('#trip-date').addEventListener('change', e => { city().date = e.target.value || todayISO(); save(); recompute(); });
-$('#trip-start').addEventListener('change', e => { const [h, m] = (e.target.value || '09:30').split(':').map(Number); city().startMin = h * 60 + m; save(); recompute(); setSceneTime(city().startMin); });
+$('#trip-start').addEventListener('change', e => { const [h, m] = (e.target.value || '09:30').split(':').map(Number); city().startMin = h * 60 + m; save(); recompute(); });
 $('#clear-city').onclick = async () => {
   const c = city();
   if (!c.hotel && !c.places.length) return toast('Nothing to clear in this city.');
@@ -2299,6 +2367,7 @@ function walkStart() {
 }
 function walkStop() {
   walk.on = false; walker.visible = false; walkBubble(null);
+  if (!timeManual) setSceneTime(nowMin());
   $('#walk-btn').classList.remove('is-on'); $('#walk-btn').textContent = '▶ Walk';
 }
 $('#walk-btn').onclick = () => walk.on ? walkStop() : walkStart();
@@ -2344,6 +2413,18 @@ function walkTick(dt, now) {
   }
 }
 controls.addEventListener('start', () => { walk.follow = false; });
+// Explore: after a pan/zoom settles, load the map around what the camera looks at
+let panTimer = null;
+function scheduleViewLoad() {
+  clearTimeout(panTimer);
+  panTimer = setTimeout(() => {
+    const t = controls.target;
+    if (Math.hypot(t.x, t.z) > 1500) return; // > 15 km from the centre: outside the city
+    viewPoint = unproject(t.x, t.z);
+    ensureMap();
+  }, 900);
+}
+controls.addEventListener('end', scheduleViewLoad);
 
 /* =====================================================================
    Live location: "you are here" marker, next stop, directions
@@ -2571,7 +2652,7 @@ function renderTickets() {
    Start
    ===================================================================== */
 switchCity(state.active);
-setSceneTime(city().startMin ?? 570);
+followRealTime();
 importShareFromHash();
 window.addEventListener('hashchange', importShareFromHash);
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(() => {});

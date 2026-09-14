@@ -7,7 +7,7 @@ import json, math, re, sys, time, urllib.request, urllib.parse, gzip, os
 
 CACHE_VER = 'v4'
 CELL = 80            # 1 cell = 80 units = 800 m
-CENTER_REACH = 79    # -> cells -1..1 on both axes (9 cells, 2.4 km square); grid offset by half a cell like the app
+CENTER_REACH = 159   # -> cells -2..2 on both axes (25 cells, 4 km square); grid offset by half a cell like the app
 SCALE = 0.1
 CITIES = {
     'barcelona': (41.3874, 2.1686),
