@@ -222,6 +222,21 @@
   .why{font-size:11.5px;color:var(--muted);margin-top:2px;font-style:italic}
   .warn a{color:var(--accent-ink);font-weight:500;margin-left:4px}
   .chips.small button{padding:3px 9px;font-size:12.5px}
+  .step.is-visited .step-row{opacity:.55;background:var(--paper-2)}
+  .step.is-visited .step-name{text-decoration:line-through}
+  .step-photo{width:46px;height:46px;border-radius:8px;object-fit:cover;flex:none;border:1.5px solid var(--line);margin-left:6px}
+  .lbl .ph{width:22px;height:22px;border-radius:999px;object-fit:cover;flex:none;border:1px solid var(--ink)}
+  .visited-box{margin-top:14px;border:1.5px dashed var(--line);border-radius:var(--radius);padding:8px 12px;font-size:13px;color:var(--ink-2)}
+  .visited-box b{color:var(--ink)}
+  .visited-box ul{margin:6px 0 0;padding-left:18px}
+  .visited-box li{margin:3px 0}
+  .visited-box button{border:0;background:transparent;color:var(--teal);text-decoration:underline;padding:0;font-size:12.5px;margin-left:6px}
+  .page-foot{flex-wrap:wrap;gap:8px;justify-content:flex-start}
+  .page-foot .spacer{flex:1}
+  .photo-row{display:flex;align-items:center;gap:10px}
+  .photo-row img{width:56px;height:56px;border-radius:8px;object-fit:cover;border:1.5px solid var(--line)}
+  .photo-row input[type=file]{display:none}
+  .icon-btn.is-on{color:var(--teal);border-color:var(--teal)}
   .step-note{font-size:12.5px;color:var(--ink-2);font-style:italic;margin-top:2px}
   .hotel-card .note{font-size:12.5px;color:var(--ink-2);font-style:italic}
   .leg .dirs{margin-top:4px}
@@ -581,6 +596,11 @@
           <ol class="steps" id="steps"></ol>
           <div id="route-empty"></div>
           <div class="page-foot">
+            <button class="btn btn-sm" id="share-btn" title="Copy a link that carries this city's plan">Share link</button>
+            <button class="btn btn-sm btn-ghost" id="offline-btn" title="Download map cells and street routes for every day of this city">Offline pack</button>
+            <button class="btn btn-sm btn-ghost" id="gpx-btn" title="Download today's route as GPX">GPX</button>
+            <button class="btn btn-sm btn-ghost" id="json-btn" title="Download all cities as JSON">JSON</button>
+            <span class="spacer"></span>
             <button class="btn btn-danger btn-sm" id="clear-city">Clear this city's data</button>
           </div>
         </div>
@@ -665,6 +685,15 @@
     <div class="field" id="f-cat-field">
       <label>Place type</label>
       <div class="chips" id="f-cat"></div>
+    </div>
+    <div class="field" id="f-photo-field">
+      <label>Photo <span style="color:var(--muted);font-weight:400">optional, stored on this device</span></label>
+      <div class="photo-row">
+        <img id="f-photo-img" alt="" hidden>
+        <label class="btn btn-sm btn-ghost" for="f-photo">Choose photo</label>
+        <input type="file" id="f-photo" accept="image/*">
+        <button type="button" class="btn btn-sm btn-ghost" id="f-photo-clear" hidden>Remove</button>
+      </div>
     </div>
     <div class="field" id="f-day-field">
       <label>Day</label>
@@ -853,14 +882,25 @@ const stayOf = p => (p.stay > 0 ? +p.stay : CATS[catOf(p)].stay);
 function dayDow(c, day) { const d = new Date((c.date || todayISO()) + 'T12:00:00'); d.setDate(d.getDate() + (day - 1)); return (d.getDay() + 6) % 7; }
 function scheduleOpts(c) { return { startMin: c.startMin ?? 570, dow: dayDow(c, c.day || 1), stayOf, hoursOf: p => parsedHours(p.hours) }; }
 const dayPlacesOf = c => c.places.filter(p => (p.day || 1) === (c.day || 1));
+// While the phone is tracking you, the route starts from where you are and the clock is "now".
+function liveStart() {
+  if (typeof mePos === 'undefined' || !mePos) return null;
+  return { id: 'me', name: 'You are here', lat: Math.round(mePos.lat * 1000) / 1000, lon: Math.round(mePos.lon * 1000) / 1000, isLive: true };
+}
+function scheduleOptsLive(c) {
+  const o = scheduleOpts(c);
+  if (liveStart()) { const d = new Date(); o.startMin = d.getHours() * 60 + d.getMinutes(); o.dow = (d.getDay() + 6) % 7; }
+  return o;
+}
 function computeRoute(c) {
-  const sub = { ...c, places: dayPlacesOf(c) };
+  const start = liveStart();
+  const sub = { ...c, hotel: start || c.hotel, places: dayPlacesOf(c).filter(p => !p.visited) };
   const r = RouteCore.computeRoute(sub, {
     warnM: TRANSIT_WARN_M,
     legOf: (a, b) => { const l = legCache.get(legKey(a, b)); return l && l.shape ? l : null; },
-    schedule: scheduleOpts(c),
+    schedule: scheduleOptsLive(c),
   });
-  if (r) r.sched = RouteCore.scheduleSteps(r.steps, scheduleOpts(c));
+  if (r) { r.sched = RouteCore.scheduleSteps(r.steps, scheduleOptsLive(c)); r.live = !!start; }
   return r;
 }
 const { hhmm } = RouteCore;
@@ -1039,7 +1079,7 @@ function buildEnvironment() {
 const CELL = 80;           // 1 cell = 80 units = 800 m; the grid is offset by half a cell so the city centre sits in the middle of cell 0:0
 const CELL_REACH = 70;     // ±700 m loaded around every place
 const CENTER_REACH = 79;   // ±790 m around the city centre → the 9 cells shipped in data/map-*.json
-const MAX_CELLS = 40;
+const MAX_CELLS = 80;
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
 let overpassCursor = 0;
 const CACHE_VER = 'v4';
@@ -1078,9 +1118,10 @@ function mapPoints() {
   const c = city();
   return [cityDef().center, ...(c.hotel ? [c.hotel] : []), ...c.places, ...(typeof mePos !== 'undefined' && mePos ? [mePos] : [])];
 }
+let extraMapPoints = [];
 function neededCells() {
   const set = new Map();
-  mapPoints().forEach((p, idx) => {
+  mapPoints().concat(extraMapPoints).forEach((p, idx) => {
     const q = project(p.lat, p.lon);
     const R = idx === 0 ? CENTER_REACH : CELL_REACH;
     const cx0 = Math.floor((q.x - R + CELL / 2) / CELL), cx1 = Math.floor((q.x + R + CELL / 2) / CELL);
@@ -1468,7 +1509,7 @@ function rebuildPins() {
   }
   for (const p of c.places) {
     const g = makePlacePin(null, catOf(p)); placeAt(g, p.lat, p.lon);
-    g.userData.id = p.id; g.userData.other = (p.day || 1) !== (c.day || 1);
+    g.userData.id = p.id; g.userData.other = (p.day || 1) !== (c.day || 1) || !!p.visited;
     if (g.userData.other) g.scale.setScalar(PIN_SCALE * 0.6);
     pinGroup.add(g); pinObjects.set(p.id, g);
   }
@@ -1567,7 +1608,8 @@ function rebuildLabels() {
   const add = (obj, cls, num, text, id) => {
     const el = document.createElement('div');
     el.className = 'lbl ' + cls + (id && id === selectedId ? ' is-selected' : '');
-    el.innerHTML = `<span class="n">${esc(num)}</span><span class="t">${esc(text)}</span>`;
+    const ph = id && photos[id] ? `<img class="ph" src="${photos[id]}" alt="">` : '';
+    el.innerHTML = `<span class="n">${esc(num)}</span>${ph}<span class="t">${esc(text)}</span>`;
     labelsEl.appendChild(el);
     labelEntries.push({ el, obj });
   };
@@ -1580,7 +1622,10 @@ function rebuildLabels() {
     });
   }
   const cc = city();
-  for (const p of cc.places) if ((p.day || 1) !== (cc.day || 1)) { const obj = pinObjects.get(p.id); if (obj) add(obj, 'is-other', 'D' + p.day, CATS[catOf(p)].emoji + ' ' + p.name, p.id); }
+  for (const p of cc.places) {
+    if ((p.day || 1) === (cc.day || 1) && !p.visited) continue;
+    const obj = pinObjects.get(p.id); if (obj) add(obj, 'is-other', p.visited ? '✓' : 'D' + p.day, CATS[catOf(p)].emoji + ' ' + p.name, p.id);
+  }
   if (previewPin) add(previewPin, 'is-preview', '?', 'Preview');
   if (typeof meGroup !== 'undefined' && meGroup.visible) add(meGroup, 'is-me', '●', 'You are here');
 }
@@ -1886,7 +1931,8 @@ function renderDayBar(c) {
 function renderRoute(route) {
   const c = city();
   renderDayBar(c);
-  const dayPlaces = dayPlacesOf(c);
+  const dayPlaces = dayPlacesOf(c).filter(p => !p.visited);
+  const visited = dayPlacesOf(c).filter(p => p.visited);
   const sum = $('#route-summary');
   const stepsEl = $('#steps');
   const emptyEl = $('#route-empty');
@@ -1896,7 +1942,7 @@ function renderRoute(route) {
   if (c.hotel) {
     hc.innerHTML = `<div class="hotel-card">
       <div class="mark">O</div>
-      <div class="body"><div class="name">${esc(c.hotel.name)}</div><div class="addr">${esc(c.hotel.address || fmtLatLon(c.hotel))}</div>${c.hotel.note ? `<div class="note">${esc(c.hotel.note)}</div>` : ''}<div class="times">Day ${c.day || 1} starts at <b>${hhmm(c.startMin ?? 570)}</b></div></div>
+      <div class="body"><div class="name">${esc(c.hotel.name)}</div><div class="addr">${esc(c.hotel.address || fmtLatLon(c.hotel))}</div>${c.hotel.note ? `<div class="note">${esc(c.hotel.note)}</div>` : ''}<div class="times">${route && route.live ? 'Route starts from <b>where you are now</b>' : `Day ${c.day || 1} starts at <b>${hhmm(c.startMin ?? 570)}</b>`}</div></div>
       <button class="icon-btn" data-act="edit-hotel" title="Edit">✎</button>
       <button class="icon-btn" data-act="del-hotel" title="Remove hotel">×</button>
     </div>`;
@@ -1910,6 +1956,8 @@ function renderRoute(route) {
   if (!route || !dayPlaces.length) {
     sum.innerHTML = `<div><b>0</b><span>places</span></div><div><b>—</b><span>total distance</span></div><div><b>—</b><span>walking time</span></div><div><b>—</b><span>day ends</span></div>`;
     stepsEl.innerHTML = '';
+    $('#visited-box')?.remove();
+    renderVisitedBox(visited);
     emptyEl.innerHTML = c.places.length
       ? `<div class="empty"><b>Nothing on Day ${c.day || 1} yet</b>Edit a place (✎) and move it to this day, or add a new one from the <button class="btn btn-sm btn-ghost" data-act="go-add" style="vertical-align:middle">Add</button> tab.</div>`
       : `<div class="empty"><b>The notebook is empty</b>Add the first place by tapping the ground in the scene or from the <button class="btn btn-sm btn-ghost" data-act="go-add" style="vertical-align:middle">Add</button> tab.</div>`;
@@ -1926,7 +1974,7 @@ function renderRoute(route) {
   let k = 0;
   stepsEl.innerHTML = route.steps.map((s, i) => {
     const n = s.node;
-    if (n.isHotel) return ''; // the hotel is shown in the card above
+    if (n.isHotel || n.isLive) return ''; // the hotel is shown in the card above; a live start has no row
     k++;
     const gmaps = `https://www.google.com/maps/dir/?api=1&destination=${n.lat},${n.lon}&travelmode=walking`;
     const dirs = s.leg && s.leg.man.length
@@ -1948,7 +1996,7 @@ function renderRoute(route) {
       <div class="step-row">
         <span class="step-num">${k}</span>
         <div class="step-body">
-          <div class="step-name" data-act="focus"><span class="cat-ico">${CATS[catOf(n)].emoji}</span>${esc(n.name)}</div>
+          <div class="step-name" data-act="focus"><span class="cat-ico">${CATS[catOf(n)].emoji}</span>${esc(n.name)}</div>${photos[n.id] ? `<img class="step-photo" src="${photos[n.id]}" alt="" style="float:right">` : ''}
           <div class="step-addr"><span class="cat-tag">${CATS[catOf(n)].label}</span> · ${esc(n.address || fmtLatLon(n))}</div>
           ${n.note ? `<div class="step-note">${esc(n.note)}</div>` : ''}
           <div class="step-ctl">
@@ -1956,6 +2004,7 @@ function renderRoute(route) {
             <span class="meter">${meter}</span>
             <span class="prio-lbl">priority</span>
             <span style="flex:1"></span>
+            <button class="icon-btn" data-act="visit" title="Mark as visited">✓</button>
             <button class="icon-btn" data-act="edit" title="Edit">✎</button>
             <button class="icon-btn" data-act="del" title="Delete">×</button>
           </div>
@@ -1963,6 +2012,14 @@ function renderRoute(route) {
       </div>
     </li>`;
   }).join('');
+  $('#visited-box')?.remove();
+  renderVisitedBox(visited);
+}
+function renderVisitedBox(visited) {
+  if (!visited.length) return;
+  const box = document.createElement('div'); box.className = 'visited-box'; box.id = 'visited-box';
+  box.innerHTML = `<b>Visited today (${visited.length})</b><ul>${visited.map(p => `<li>${CATS[catOf(p)].emoji} ${esc(p.name)}<button data-act="unvisit" data-id="${p.id}">undo</button></li>`).join('')}</ul>`;
+  $('#route-empty').after(box);
 }
 const fmtLatLon = p => `${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}`;
 
@@ -1980,13 +2037,16 @@ $('#panel-body').addEventListener('click', async e => {
     }
     return;
   }
+  if (act === 'unvisit') { const q = c.places.find(x => x.id === btn.dataset.id); if (q) { q.visited = false; save(); rebuildPins(); recompute(); } return; }
   const p = c.places.find(x => x.id === id); if (!p) return;
+  if (act === 'visit') { p.visited = true; save(); rebuildPins(); recompute(); toast(`${p.name} marked as visited.`); return; }
   if (act === 'inc' || act === 'dec') {
     const v = Math.max(1, Math.min(10, p.priority + (act === 'inc' ? 1 : -1)));
     if (v !== p.priority) { p.priority = v; save(); recompute(); }
   } else if (act === 'del') {
     if (await confirmDialog('Delete this place?', `${p.name} will be removed from the list and the route.`, 'Delete')) {
       c.places = c.places.filter(x => x.id !== id); if (selectedId === id) selectedId = null;
+      if (photos[id]) { delete photos[id]; savePhotos(); }
       save(); rebuildPins(); recompute(); toast('Deleted.');
     }
   } else if (act === 'focus') {
@@ -2017,6 +2077,87 @@ $('#clear-city').onclick = async () => {
   }
 };
 $('#fit-btn').onclick = () => fitAll();
+async function offlinePack() {
+  const c = city(); const btn = $('#offline-btn'); btn.disabled = true;
+  try {
+    const days = c.days || 1; const pts = [];
+    for (let d = 1; d <= days; d++) {
+      const r = RouteCore.computeRoute({ ...c, day: d, places: c.places.filter(p => (p.day || 1) === d && !p.visited) }, { warnM: TRANSIT_WARN_M, legOf: (a, b) => { const l = legCache.get(legKey(a, b)); return l && l.shape ? l : null; }, schedule: { ...scheduleOpts(c), dow: dayDow(c, d) } });
+      if (!r) continue;
+      for (let k = 1; k < r.steps.length; k++) {
+        const a = r.steps[k - 1].node, b = r.steps[k].node, key = legKey(a, b);
+        let leg = legCache.get(key);
+        if (!leg || !leg.shape) { setStatus(`Offline pack: street route day ${d}, leg ${k}/${r.steps.length - 1}`); try { leg = await fetchLeg(a, b); legCache.set(key, leg); } catch { leg = null; } await sleep(200); }
+        const shape = leg && leg.shape ? leg.shape : [[a.lat, a.lon], [b.lat, b.lon]];
+        for (let i = 0; i < shape.length; i += Math.max(1, Math.floor(shape.length / 12))) pts.push({ lat: shape[i][0], lon: shape[i][1] });
+      }
+    }
+    saveLegs();
+    extraMapPoints = pts;
+    setStatus('Offline pack: map cells along the routes…');
+    await ensureMap(true);
+    extraMapPoints = [];
+    setStatus('');
+    toast('Offline pack ready: map cells and street routes for every day are stored on this device.', 5000);
+  } finally { btn.disabled = false; setStatus(''); }
+}
+$('#offline-btn').onclick = offlinePack;
+
+/* ---- Share link: the city's plan compressed into the URL hash ---- */
+const b64u = { enc: bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''), dec: str => Uint8Array.from(atob(str.replace(/-/g, '+').replace(/_/g, '/')), ch => ch.charCodeAt(0)) };
+async function packShare(obj) {
+  const json = new TextEncoder().encode(JSON.stringify(obj));
+  if (typeof CompressionStream === 'undefined') return 'j.' + b64u.enc(json);
+  const buf = await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer();
+  return 'z.' + b64u.enc(new Uint8Array(buf));
+}
+async function unpackShare(str) {
+  const [kind, data] = [str.slice(0, 1), str.slice(2)];
+  const bytes = b64u.dec(data);
+  if (kind === 'j') return JSON.parse(new TextDecoder().decode(bytes));
+  const buf = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer();
+  return JSON.parse(new TextDecoder().decode(buf));
+}
+$('#share-btn').onclick = async () => {
+  const c = city();
+  if (!c.hotel && !c.places.length) return toast('Nothing to share yet.');
+  const payload = { v: 1, city: state.active, hotel: c.hotel, places: c.places.map(p => ({ ...p, visited: false })), days: c.days, startMin: c.startMin, date: c.date };
+  const url = location.origin + location.pathname + '#share=' + await packShare(payload);
+  try {
+    if (navigator.share) await navigator.share({ title: `Route Notebook — ${cityDef().name}`, url });
+    else { await navigator.clipboard.writeText(url); toast('Link copied — anyone who opens it gets this plan.', 4000); }
+  } catch { try { await navigator.clipboard.writeText(url); toast('Link copied.'); } catch { prompt('Copy this link:', url); } }
+};
+async function importShareFromHash() {
+  const m = location.hash.match(/#share=([^&]+)/); if (!m) return;
+  history.replaceState(null, '', location.pathname);
+  try {
+    const d = await unpackShare(m[1]);
+    if (!d || !CITIES[d.city]) throw new Error('bad payload');
+    const n = (d.places || []).length;
+    if (!(await confirmDialog(`Import a shared plan for ${CITIES[d.city].name}?`, `${n} place(s)${d.hotel ? ' and a hotel' : ''}. This replaces what you have for ${CITIES[d.city].name}.`, 'Import'))) return;
+    state.cities[d.city] = normalizeCity({ hotel: d.hotel || null, places: d.places || [], day: 1, days: d.days || 1, startMin: d.startMin ?? 570, date: d.date || todayISO() });
+    state.active = d.city; save();
+    switchCity(d.city); fitAll();
+    toast('Plan imported.');
+  } catch (e) { toast('This link could not be read.'); }
+}
+
+/* ---- Export: JSON (everything) and GPX (today's route) ---- */
+function download(name, text, type) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+$('#json-btn').onclick = () => download(`route-notebook-${todayISO()}.json`, JSON.stringify({ exported: new Date().toISOString(), ...state }, null, 2), 'application/json');
+$('#gpx-btn').onclick = () => {
+  const r = currentRoute; if (!r) return toast('No route to export.');
+  const c = city(), name = `${cityDef().name} day ${c.day || 1}`;
+  const wpts = r.steps.map((st, k) => `  <wpt lat="${st.node.lat}" lon="${st.node.lon}"><name>${esc(k === 0 ? (st.node.isHotel ? 'Hotel: ' : '') + st.node.name : `${k}. ${st.node.name}`)}</name>${st.node.note ? `<desc>${esc(st.node.note)}</desc>` : ''}<time>${new Date((c.date || todayISO()) + 'T00:00:00').toISOString()}</time></wpt>`).join('\n');
+  const pts = [];
+  r.steps.forEach((st, k) => { const sh = k === 0 ? [[st.node.lat, st.node.lon]] : (st.leg ? st.leg.shape : [[st.node.lat, st.node.lon]]); for (const [lat, lon] of sh) pts.push(`      <trkpt lat="${lat}" lon="${lon}"></trkpt>`); });
+  const gpx = `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Route Notebook" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>${esc(name)}</name></metadata>\n${wpts}\n  <trk><name>${esc(name)} — walking route</name><trkseg>\n${pts.join('\n')}\n    </trkseg></trk>\n</gpx>`;
+  download(`route-notebook-${state.active}-day${c.day || 1}.gpx`, gpx, 'application/gpx+xml');
+};
 $('#map-btn').onclick = () => { failedCells.clear(); ensureMap(true); toast('Reloading map…'); };
 
 /* =====================================================================
@@ -2024,7 +2165,26 @@ $('#map-btn').onclick = () => { failedCells.clear(); ensureMap(true); toast('Rel
    ===================================================================== */
 let pending = null; // {lat, lon, address, name}
 let sheetType = 'place';
-let editing = null, editingHotel = false, sheetCat = 'sight', sheetDay = 1;
+let editing = null, editingHotel = false, sheetCat = 'sight', sheetDay = 1, sheetPhoto = null;
+const PHOTO_STORE = 'rotaDefteri.photos.v1';
+let photos = {};
+try { photos = JSON.parse(localStorage.getItem(PHOTO_STORE) || '{}'); } catch {}
+function savePhotos() { try { localStorage.setItem(PHOTO_STORE, JSON.stringify(photos)); } catch { toast('Photo could not be stored (device storage is full).'); } }
+function resizeImage(file, max = 240) {
+  return new Promise((res, rej) => {
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const cv = document.createElement('canvas'); cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url); res(cv.toDataURL('image/jpeg', 0.72));
+    };
+    img.onerror = rej; img.src = url;
+  });
+}
+function showSheetPhoto() { const im = $('#f-photo-img'); im.hidden = !sheetPhoto; if (sheetPhoto) im.src = sheetPhoto; $('#f-photo-clear').hidden = !sheetPhoto; }
+$('#f-photo').addEventListener('change', async e => { const f = e.target.files[0]; if (!f) return; try { sheetPhoto = await resizeImage(f); showSheetPhoto(); } catch { toast('Could not read that image.'); } e.target.value = ''; });
+$('#f-photo-clear').onclick = () => { sheetPhoto = null; showSheetPhoto(); };
 const dayBox = $('#f-day');
 function renderSheetDays(c) {
   const n = Math.max(c.days || 1, sheetDay);
@@ -2045,6 +2205,7 @@ function openSheet(loc, presetName = '', opts = {}) {
   $('#f-prio').value = pr; $('#f-prio-out').textContent = pr;
   setSheetCat(editing ? catOf(editing) : (opts.cat || loc.cat || 'sight'));
   sheetDay = editing ? (editing.day || 1) : (city().day || 1); renderSheetDays(city());
+  sheetPhoto = editing ? (photos[editing.id] || null) : null; showSheetPhoto();
   $('#f-stay').value = editing?.stay || ''; $('#f-stay').placeholder = String(CATS[sheetCat].stay);
   $('#f-hours').value = editing ? (editing.hours || '') : (loc.hours || '');
   setSheetType(editingHotel ? 'hotel' : 'place');
@@ -2060,7 +2221,7 @@ function setSheetType(t) {
   $('#f-type').querySelectorAll('button').forEach(b => b.classList.toggle('is-on', b.dataset.v === t));
   $('#f-prio-field').style.display = t === 'hotel' ? 'none' : '';
   $('#f-cat-field').style.display = t === 'hotel' ? 'none' : '';
-  for (const id of ['f-day-field', 'f-stay-field', 'f-hours-field']) $('#' + id).style.display = t === 'hotel' ? 'none' : '';
+  for (const id of ['f-day-field', 'f-stay-field', 'f-hours-field', 'f-photo-field']) $('#' + id).style.display = t === 'hotel' ? 'none' : '';
   $('#sheet-title').textContent = t === 'hotel' ? 'Mark hotel' : 'New place';
 }
 $('#f-type').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSheetType(b.dataset.v); });
@@ -2081,6 +2242,8 @@ $('#sheet').addEventListener('submit', async e => {
       editing.priority = +$('#f-prio').value || 5; editing.cat = sheetCat; editing.day = sheetDay;
       editing.stay = +$('#f-stay').value || 0; editing.hours = $('#f-hours').value.trim();
       c.days = Math.max(c.days || 1, sheetDay);
+      if (sheetPhoto) photos[editing.id] = sheetPhoto; else delete photos[editing.id];
+      savePhotos();
     }
     closeSheet(); save(); rebuildPins(); recompute(); toast('Updated.');
     return;
@@ -2094,6 +2257,7 @@ $('#sheet').addEventListener('submit', async e => {
     const priority = +$('#f-prio').value || 5;
     const place = { id: uid(), name, note, cat: sheetCat, day: sheetDay, stay: +$('#f-stay').value || 0, hours: $('#f-hours').value.trim(), osm: loc.osm || null, lat: loc.lat, lon: loc.lon, address: loc.address || '', priority };
     c.places.push(place); c.days = Math.max(c.days || 1, sheetDay);
+    if (sheetPhoto) { photos[place.id] = sheetPhoto; savePhotos(); }
     if (!place.hours && place.osm) fetchHours(place);
     toast(`"${name}" added${sheetDay !== (c.day || 1) ? ` to Day ${sheetDay}` : ''}.`);
   }
@@ -2193,6 +2357,40 @@ meGroup.add(meDisc, meRing); meGroup.visible = false; meGroup.userData.top = 3;
 scene.add(meGroup);
 controls.addEventListener('start', () => { follow = false; $('#follow-btn')?.classList.remove('is-on'); });
 
+const nearSince = new Map(); let lastLiveKey = '', lastNotifyCheck = 0; const notified = new Set();
+function notify(title, body) {
+  toast(`${title} — ${body}`, 5000);
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  navigator.serviceWorker?.ready.then(r => r.showNotification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png' })).catch(() => { try { new Notification(title, { body, icon: 'icon-192.png' }); } catch {} });
+}
+function liveChecks() {
+  const c = city(), now = Date.now();
+  // auto-visit: within 40 m of a place on today's list for 5 minutes
+  for (const p of dayPlacesOf(c)) {
+    if (p.visited) continue;
+    const d = haversine(mePos, p);
+    if (d < 40) { if (!nearSince.has(p.id)) nearSince.set(p.id, now); else if (now - nearSince.get(p.id) > 5 * 60000) { p.visited = true; nearSince.delete(p.id); save(); rebuildPins(); recompute(); notify('Visited', `${p.name} marked as visited — route updated.`); } }
+    else nearSince.delete(p.id);
+  }
+  // approaching the next stop
+  if (currentRoute && currentRoute.steps.length > 1) {
+    const st = currentRoute.steps[1]; const d = haversine(mePos, st.node);
+    if (d < 200 && !notified.has('near:' + st.node.id)) { notified.add('near:' + st.node.id); notify('Almost there', `${st.node.name} is ${fmtDist(d)} away.`); }
+  }
+  // closing soon (checked once a minute)
+  if (now - lastNotifyCheck > 60000) {
+    lastNotifyCheck = now;
+    const d = new Date(), m = d.getHours() * 60 + d.getMinutes(), dow = (d.getDay() + 6) % 7;
+    for (const p of dayPlacesOf(c)) {
+      const oh = parsedHours(p.hours); if (!oh || p.visited) continue;
+      const cl = RouteCore.closesAt(oh, dow, m);
+      if (cl != null && cl - m <= 30 && cl - m > 0 && !notified.has('close:' + p.id)) { notified.add('close:' + p.id); notify('Closing soon', `${p.name} closes at ${hhmm(cl)}.`); }
+    }
+  }
+  // moved ~100 m: recompute the live route from here
+  const key = liveStart().lat + ',' + liveStart().lon;
+  if (key !== lastLiveKey) { lastLiveKey = key; recompute(); }
+}
 function onPosition(pos) {
   mePos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
   const { x, z } = project(mePos.lat, mePos.lon);
@@ -2201,12 +2399,13 @@ function onPosition(pos) {
   if (first) { meGroup.visible = true; follow = true; flyTo(meGroup.position, 150); rebuildLabels(); ensureMap(); }
   else if (follow && !camTween) { const d = meGroup.position.clone().sub(controls.target); controls.target.add(d); camera.position.add(d); }
   if (Date.now() - lastMapCheck > 20000) { lastMapCheck = Date.now(); ensureMap(); }
+  liveChecks();
   updateNav();
 }
 function stopLocation() {
   if (geoWatch !== null) navigator.geolocation.clearWatch(geoWatch);
-  geoWatch = null; mePos = null; follow = false; meGroup.visible = false;
-  $('#loc-btn').classList.remove('is-on'); rebuildLabels(); updateNav();
+  geoWatch = null; mePos = null; follow = false; meGroup.visible = false; lastLiveKey = '';
+  $('#loc-btn').classList.remove('is-on'); rebuildLabels(); updateNav(); recompute();
 }
 function toggleLocation() {
   if (geoWatch !== null) return stopLocation();
@@ -2215,6 +2414,7 @@ function toggleLocation() {
   geoWatch = navigator.geolocation.watchPosition(onPosition, err => { toast('Could not get location: ' + err.message); stopLocation(); },
     { enableHighAccuracy: true, maximumAge: 3000, timeout: 25000 });
   $('#loc-btn').classList.add('is-on');
+  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {});
   toast('Tracking location — dragging the scene stops following.');
 }
 $('#loc-btn').onclick = toggleLocation;
@@ -2372,6 +2572,8 @@ function renderTickets() {
    ===================================================================== */
 switchCity(state.active);
 setSceneTime(city().startMin ?? 570);
+importShareFromHash();
+window.addEventListener('hashchange', importShareFromHash);
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(() => {});
 </script>
 </body>
