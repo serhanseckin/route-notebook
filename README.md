@@ -25,9 +25,14 @@ Live: https://serhanseckin.github.io/route-notebook/
   right-drag to rotate, double-tap the ground to add a place.
 
 **Getting started**
-- A three-step wizard: your name, city and dates (plus hotel) → your bucket list, straight from
-  your head with a 1–10 "want" score, looked up on the map → breakfast, lunch and dinner for
-  every day. It opens on first launch and is always one tap away ("Plan wizard").
+- A four-step wizard: your name, city and dates (plus hotel) → fixed events such as a match or
+  a concert → your bucket list, straight from your head with a 1–10 "want" score and a picture
+  that reminds you why, looked up on the map → breakfast, lunch and dinner for every day, with a
+  capacity check ("fits / tight") and an auto-fill by priority. It opens on first launch and is
+  always one tap away ("Plan wizard").
+- Fixed events are anchors: the hotel is the start, the event happens at its time and place
+  (venue presets such as Camp Nou and San Siro), and everything in between is arranged by the
+  algorithm. Meal times that overlap an event are flagged.
 - Weather for your dates from Open-Meteo: an icon on each day tab and a hint that suggests
   moving indoor places to rainy days and parks to sunny ones.
 
@@ -52,7 +57,16 @@ Live: https://serhanseckin.github.io/route-notebook/
 - Real pedestrian legs from FOSSGIS Valhalla with distance, time and turn-by-turn directions;
   legs over 1.8 km show the nearest metro/tram stations and a transit link.
 
-**Journal (a bit of a game)**
+**Journal (a game, really)**
+- XP and levels (Tourist → Wanderer → Explorer → Local → Legend → Myth) from visits, pages,
+  photos, quests, badges and trophies.
+- Three quests every morning: two city-themed photo challenges (a Gothic Quarter door older than
+  your grandparents, a yellow tram in a shop window, a nasone you actually drink from…) and one
+  automatic challenge (walk 5 km, reach three places, beat the crowds).
+- Passport stamps per city with day-by-day completion, walking stats from your live location
+  (km, steps, kcal, longest walk) and a shareable stats card.
+- Landmark trophies: reach the Sagrada Família, the Duomo or the Colosseum and its model turns
+  to gold, with a line of commentary you did not ask for.
 - Tap any pin for a card with the photo, note, hours and scheduled time.
 - Reaching a place (by location, or ticking ✓) unlocks its journal page: a photo of what you had
   and a few words. The Journal tab collects the pages by city and day, with badges such as
